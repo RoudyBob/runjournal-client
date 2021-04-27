@@ -1,4 +1,4 @@
-.App {
+.app {
   text-align: center;
 }
 
@@ -35,4 +35,39 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.homepage {
+  margin-top: 100px;
+  color: white;
+}
+
+.main-wrapper {
+  margin-top: 100px;
+  color: white;
+}
+
+.sidebar-wrapper {
+  color: green;
+}
+
+.auth-wrapper {
+  margin-top: 100px;
+}
+
+.mainpage {
+  margin-top: 100px;
+  color: white;
+}
+
+.logoutpage {
+  margin-top: 100px;
+  color: white;
+}
+
+.signup-login {
+  font-size: 13px !important;
+  padding-top: 10px !important;
+  color: #7f7d7d !important;
+  margin: 0 imp !important;
 }

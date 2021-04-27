@@ -1,47 +1,89 @@
-import React, {useState } from 'react';
+import React from 'react';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
 
-import Auth from "./Auth/Auth";
-import Login from "./Auth/Login";
-import Signup from "./Auth/Signup";
 import Header from "./Components/Header";
+import Home from "./Components/Home";
 import Main from "./Components/Main";
+import Auth from "./Auth/Auth";
+import Logout from "./Auth/Logout";
 
-function App() {
+export interface AppProps {
+    
+}
+ 
+export interface AppState {
+    sessionToken: string | null,
+    newToken: string,
+    showLogin: boolean
+}
 
-  const [sessionToken, setSessionToken] = useState('');
+class App extends React.Component<AppProps, AppState> {
+  constructor(props: AppProps) {
+      super(props);
+      this.state = {
+        sessionToken: '',
+        newToken: '',
+        showLogin: true
+      };
+  }
 
-  const updateToken = (newToken: any) => {
+  homeView = () => {
+    return (this.state.sessionToken ? <Main token={this.state.sessionToken} /> : <Home token={this.state.sessionToken}/>);
+  };
+
+  mainView = () => {
+    return (this.state.sessionToken ? <Main token={this.state.sessionToken} /> : <Redirect to="/" />);
+  };
+
+  updateToken = (newToken: string) => {
     localStorage.setItem('token', newToken);
-    setSessionToken(newToken);
-    console.log(newToken);
+    this.setState({ sessionToken: newToken});
   }
 
-  const clearToken = () => {
+  clearToken = () => {
     localStorage.clear();
-    setSessionToken('');
+    this.setState({ sessionToken: '' });
   }
 
-  return (
-    <Router>
-      <div className="App">
-        <Header />
-  
-        <div className="auth-wrapper">
-          <div className="auth-inner">
-            <Switch>
-              <Route exact path='/' component={Login} />
-              <Route path="/sign-in" component={Login} />
-              <Route path="/sign-up" component={Signup} />
-            </Switch>
-          </div>
-        </div>
+  componentDidMount () {
+    if (localStorage.getItem('token')) {
+      this.setState({ sessionToken: localStorage.getItem('token') });
+    }
+  }
 
-      </div>
-    </Router>
-  );
+  render() {
+    return (
+      <React.Fragment>
+        <Router>
+          <div className="app">
+            <Header token={this.state.sessionToken}/>
+            <Switch>
+              <Route exact path="/" component={this.homeView} />
+              <Route path="/main" component={this.mainView} />
+              <Route path="/login"><Auth updateToken={this.updateToken} showLogin={true} /></Route>
+              <Route path="/signup"><Auth updateToken={this.updateToken} showLogin={false} /></Route>
+              <Route path="/logout"><Logout clearToken={this.clearToken} /></Route>
+            </Switch>
+  
+  
+            {/* <div className="auth-wrapper">
+              <div className="auth-inner">
+                <Switch>
+                  <Route exact path='/' component={Login} />
+                  <Route path="/sign-in" component={Login} />
+                  <Route path="/sign-up" component={Signup} />
+                </Switch>
+              </div>
+            </div> */}
+  
+          </div>
+        </Router>
+  
+      </React.Fragment>
+    );
+  }
 }
 
 export default App;

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Component } from 'react';
 
 export interface SidebarProps {
     
@@ -17,7 +16,9 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
 
     render() { 
         return (
-            <div>Hello from Sidebar</div>
+            <div className="sidebar-wrapper">
+                <h2>Hello from Sidebar</h2>
+            </div>
         );
     }
 }

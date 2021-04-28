@@ -1,5 +1,10 @@
 .app {
+  display: flex;
   text-align: center;
+  height: 100%;
+  overflow: hidden;
+  margin: 0px;
+  box-sizing: border-box;
 }
 
 .App-logo {
@@ -43,12 +48,26 @@
 }
 
 .main-wrapper {
-  margin-top: 100px;
   color: white;
+  margin-top: 56px;
+  display: flex;
+  width: 100%;
 }
 
-.sidebar-wrapper {
-  color: green;
+.main-inner{
+  background-color: orchid;
+  flex: 3;
+}
+
+.calendar-wrapper {
+  padding-left: 200px;
+  padding-right: 200px;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.sidebar {
+  flex: 1;
 }
 
 .auth-wrapper {

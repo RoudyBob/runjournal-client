@@ -1,5 +1,10 @@
-.App {
+.app {
+  display: flex;
   text-align: center;
+  height: 100%;
+  overflow: hidden;
+  margin: 0px;
+  box-sizing: border-box;
 }
 
 .App-logo {
@@ -35,4 +40,53 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.homepage {
+  margin-top: 100px;
+  color: white;
+}
+
+.main-wrapper {
+  color: white;
+  margin-top: 56px;
+  display: flex;
+  width: 100%;
+}
+
+.main-inner{
+  background-color: orchid;
+  flex: 3;
+}
+
+.calendar-wrapper {
+  padding-left: 200px;
+  padding-right: 200px;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.sidebar {
+  flex: 1;
+}
+
+.auth-wrapper {
+  margin-top: 100px;
+}
+
+.mainpage {
+  margin-top: 100px;
+  color: white;
+}
+
+.logoutpage {
+  margin-top: 100px;
+  color: white;
+}
+
+.signup-login {
+  font-size: 13px !important;
+  padding-top: 10px !important;
+  color: #7f7d7d !important;
+  margin: 0 imp !important;
 }

@@ -17,6 +17,7 @@ class Logout extends React.Component<LogoutProps, LogoutState> {
     componentDidMount () {
         this.props.clearToken();
     }
+    
     render() { 
         return (
             <div className="logoutpage">

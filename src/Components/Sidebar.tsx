@@ -4,10 +4,10 @@ import { FaRunning, FaCalendarAlt, FaCloudDownloadAlt } from "react-icons/fa";
 import './Sidebar.scss';
 
 export interface SidebarProps {
-    planToggle: Function,
-    planModal: boolean,
-    workoutToggle: Function,
-    workoutModal: boolean
+    createPlanToggle: Function,
+    createPlanModal: boolean,
+    createWorkoutToggle: Function,
+    createWorkoutModal: boolean
 }
  
 export interface SidebarState {
@@ -22,14 +22,12 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
 
     render() { 
 
-        console.log(this.props.planModal)
-
         return (
             <div id="sidebar">
                 <ProSidebar>
                     <Menu iconShape="square">
-                        <MenuItem icon={<FaCalendarAlt />} onClick={() => this.props.planToggle()}>Create Plan Entry</MenuItem>
-                        <MenuItem icon={<FaRunning />} onClick={() => this.props.workoutToggle()}>Record Workout</MenuItem>
+                        <MenuItem icon={<FaCalendarAlt />} onClick={() => this.props.createPlanToggle()}>Create Plan Entry</MenuItem>
+                        <MenuItem icon={<FaRunning />} onClick={() => this.props.createWorkoutToggle()}>Record Workout</MenuItem>
                         <MenuItem icon={<FaCloudDownloadAlt />}>Import Workout</MenuItem>
                     </Menu>
                     <SidebarHeader>

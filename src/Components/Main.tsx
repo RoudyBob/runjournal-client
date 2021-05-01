@@ -2,53 +2,140 @@ import * as React from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
 import Sidebar from './Sidebar';
-import PlanModal from './PlanModal';
-import WorkoutModal from './WorkoutModal';
+import CreatePlanModal from './CreatePlanModal';
+import CreateWorkoutModal from './CreateWorkoutModal';
+import ViewPlanModal from './ViewPlanModal';
+import ViewWorkoutModal from './ViewWorkoutModal';
 import ImportModal from './ImportModal';
 import ChoiceModal from './ChoiceModal';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import APIURL from '../Helpers/environment';
+
 
 export interface MainProps {
     token: string,
-
+    userid: string | null
 }
  
 export interface MainState {
-    planModal: boolean,
-    workoutModal: boolean,
+    createPlanModal: boolean,
+    viewPlanModal: boolean,
+    selectedPlan: {
+        id: number,
+        date: string,
+        description: string,
+        type: string,
+        distance: number,
+        units: string,
+        notes: string
+    }
+    createWorkoutModal: boolean,
+    viewWorkoutModal: boolean,
+    selectedWorkout: {
+        id: number,
+        timestamp: string,
+        description: string,
+        distance: number,
+        units: string,
+        movingtime: number,
+        elapsedtime: number,
+        elevationgain: number,
+        startlocation: Array<Number>,
+        endlocation: Array<Number>,
+        temp: number,
+        humidity: number,
+        aqi: number,
+        notes: string
+    }
     importModal: boolean,
     choiceModal: boolean,
     events: [
         {
-            start: Date,
-            end: Date,
-            title: string
+            start: Date | null,
+            end: Date | null,
+            title: string,
+            type: string,
+            id: Number,
+            allDay?: boolean,
+            resource?: any
         }
-    ]
+    ],
+    description: string
+}
+
+export interface planEvent {
+    date: Date, 
+    description: string,
+    id: Number
+}
+
+export interface workoutEvent {
+    timestamp: Date, 
+    description: string,
+    id: Number
+}
+
+export interface calendarEvent {
+    start: Date | null,
+    end: Date | null,
+    title: string,
+    type: string,
+    id: Number,
+    allDay?: boolean,
+    resource?: any
 }
  
 class Main extends React.Component<MainProps, MainState> {
     constructor(props: MainProps) {
         super(props);
         this.state = { 
-            planModal: false,
-            workoutModal: false,
+            createPlanModal: false,
+            viewPlanModal: false,
+            selectedPlan: {
+                id: 0,
+                date: '',
+                description: '',
+                type: '',
+                distance: 0,
+                units: '',
+                notes: ''
+            },
+            createWorkoutModal: false,
+            viewWorkoutModal: false,
+            selectedWorkout: {
+                id: 0,
+                timestamp: '',
+                description: '',
+                distance: 0,
+                units: '',
+                movingtime: 0,
+                elapsedtime: 0,
+                elevationgain: 0,
+                startlocation: [],
+                endlocation: [],
+                temp: 0,
+                humidity: 0,
+                aqi: 0,
+                notes: ''
+            },
             importModal: false,
             choiceModal: false,
             events: [
                 {
-                    start: moment().toDate(),
-                    end: moment().add(1, "days").toDate(),
-                    title: "Some title"
+                    start: null,
+                    end: null,
+                    title: '',
+                    type: '',
+                    id: 0
                 }
-            ]
+            ],
+            description: ''
         };
     }
 
-    planToggle = () => {
-        console.log('In Plan Toggle');
+    createPlanToggle = () => {
         this.setState(prevState => ({
-            planModal: !prevState.planModal
+            createPlanModal: !prevState.createPlanModal
         }));
 
         if (this.state.choiceModal) {
@@ -58,10 +145,46 @@ class Main extends React.Component<MainProps, MainState> {
         };
     }
 
-    workoutToggle = () => {
-        console.log('In Workout Toggle');
+    viewPlanToggle = () => {
         this.setState(prevState => ({
-            workoutModal: !prevState.workoutModal
+            viewPlanModal: !prevState.viewPlanModal
+        }));
+
+        if (this.state.choiceModal) {
+            this.setState(prevState => ({
+                choiceModal: !prevState.choiceModal
+            }));
+        };
+    }
+
+    fetchPlan = (id: Number) => {
+        fetch(`${APIURL}/plan/get/${id}`, {
+            method: 'GET',
+            headers: new Headers ({
+                'Content-Type': 'application/json',
+                'Authorization': this.props.token
+            })
+        })
+        .then((response) => response.json())
+        .then((plan) => {
+            console.log(plan);
+            this.setState({ 
+                selectedPlan: {
+                    id: plan.id,
+                    date: plan.date,
+                    description: plan.description,
+                    type: plan.type,
+                    distance: plan.distance,
+                    units: plan.units,
+                    notes: plan.notes
+                }
+            });
+        });
+    }
+
+    createWorkoutToggle = () => {
+        this.setState(prevState => ({
+            createWorkoutModal: !prevState.createWorkoutModal
         }));
         
         if (this.state.choiceModal) {
@@ -71,61 +194,169 @@ class Main extends React.Component<MainProps, MainState> {
         };
     }
 
+    viewWorkoutToggle = () => {
+        this.setState(prevState => ({
+            viewWorkoutModal: !prevState.viewWorkoutModal
+        }));
+        
+        if (this.state.choiceModal) {
+            this.setState(prevState => ({
+                choiceModal: !prevState.choiceModal
+            }));
+        };
+    }
+
+    fetchWorkout = (id: Number) => {
+        fetch(`${APIURL}/workout/get/${id}`, {
+            method: 'GET',
+            headers: new Headers ({
+                'Content-Type': 'application/json',
+                'Authorization': this.props.token
+            })
+        })
+        .then((response) => response.json())
+        .then((workout) => {
+            console.log(workout);
+            this.setState({ 
+                selectedWorkout: {
+                    id: workout.id,
+                    timestamp: workout.timestamp.toString().replace('Z', ''), //HTML input requires removing Z
+                    description: workout.description,
+                    distance: workout.distance,
+                    units: workout.units,
+                    movingtime: workout.movingtime,
+                    elapsedtime: workout.elapsedtime,
+                    elevationgain: workout.elevationgain,
+                    startlocation: workout.startlocation,
+                    endlocation: workout.endlocation,
+                    temp: workout.temp,
+                    humidity: workout.humidity,
+                    aqi: workout.aqi,
+                    notes: workout.notes
+                }
+            });
+        });
+    }
+
     importToggle = () => {
-        console.log('In Import Toggle');
         this.setState(prevState => ({
             importModal: !prevState.importModal
         }));
     }
 
     choiceToggle = () => {
-        console.log('In Choice Toggle');
         this.setState(prevState => ({
             choiceModal: !prevState.choiceModal
         }));
     }
 
-    handleSelect = ({ start, end } : { start: any, end: any }) => {
-        const title = window.prompt('New Event Name');
-        console.log(title);
-        if (title) {
-            var tmpArray = this.state.events;
-            tmpArray.push({ start, end, title });
-            this.setState({ events: tmpArray });
-            console.log(this.state.events);
+    fetchPlans = () => {
+        fetch(`${APIURL}/plan/${this.props.userid}`, {
+            method: 'GET',
+            headers: new Headers ({
+                'Content-Type': 'application/json',
+                'Authorization': this.props.token
+            })
+        })
+        .then((response) => response.json())
+        .then((plans) => {
+            var tmpPlans = this.state.events;
+            plans.forEach((plan: planEvent) =>{
+                var newEvent = {
+                    start: new Date(plan.date),
+                    end: new Date(plan.date),
+                    title: plan.description,
+                    type: "plan",
+                    id: plan.id
+                }
+                tmpPlans.push(newEvent);
+                // console.log(`${plan.id} starts on ${newEvent.start}`);
+            });
+
+            this.setState({ events: tmpPlans });
+        })
+
+    };
+
+    fetchWorkouts = () => {
+        fetch(`${APIURL}/workout/${this.props.userid}`, {
+            method: 'GET',
+            headers: new Headers ({
+                'Content-Type': 'application/json',
+                'Authorization': this.props.token
+            })
+        })
+        .then((response) => response.json())
+        .then((workouts) => {
+            var tmpWorkouts = this.state.events;
+            workouts.forEach((workout: workoutEvent) =>{
+                var newEvent = {
+                    start: new Date(workout.timestamp),
+                    end: new Date(workout.timestamp),
+                    title: workout.description,
+                    type: "workout",
+                    id: workout.id
+                }
+                tmpWorkouts.push(newEvent);
+                // console.log(`${plan.id} starts on ${newEvent.start}`);
+            });
+            this.setState({ events: tmpWorkouts });
+        })
+
+    };
+
+    handleSelect = (event: calendarEvent) => {
+        if (event.type === "plan") {
+            this.fetchPlan(event.id);
+            this.viewPlanToggle();
+        } else {
+            this.fetchWorkout(event.id);
+            this.viewWorkoutToggle();
         }
     }
 
+    componentDidMount() {
+        this.fetchPlans();
+        this.fetchWorkouts();
+    }
 
     render() { 
         const localizer = momentLocalizer(moment);
 
         return (
             <div className="main-wrapper">
-                <PlanModal planToggle={this.planToggle} planModal={this.state.planModal} />
-                <WorkoutModal workoutToggle={this.workoutToggle} workoutModal={this.state.workoutModal} />
-                <ImportModal importToggle={this.importToggle} importModal={this.state.importModal} />
-                <ChoiceModal choiceToggle={this.choiceToggle} workoutToggle={this.workoutToggle} planToggle={this.planToggle} choiceModal={this.state.choiceModal} />
-
+                <CreatePlanModal token={this.props.token} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} />
+                <CreateWorkoutModal token={this.props.token} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} />
+                <ViewPlanModal token={this.props.token} viewPlanToggle={this.viewPlanToggle} viewPlanModal={this.state.viewPlanModal} selectedPlan={this.state.selectedPlan} />
+                <ViewWorkoutModal token={this.props.token} viewWorkoutToggle={this.viewWorkoutToggle} viewWorkoutModal={this.state.viewWorkoutModal} selectedWorkout={this.state.selectedWorkout} />
+                <ImportModal token={this.props.token} importToggle={this.importToggle} importModal={this.state.importModal} />
+                <ChoiceModal choiceToggle={this.choiceToggle} createWorkoutToggle={this.createWorkoutToggle} createPlanToggle={this.createPlanToggle} choiceModal={this.state.choiceModal} />
 
                 <div className="main-inner">
-                    <h1>Hello from Main!</h1>
-                    <p>{this.props.token}</p>
                     <div className="calendar-wrapper">
                         <Calendar
                             selectable
+                            culture='en-US'
                             localizer={localizer}
                             defaultView={'month'}
+                            views={['month']}
+                            toolbar={true}
                             events={this.state.events}
+                            eventPropGetter={
+                                event => ({
+                                    className: event.type
+                                })
+                            }
                             startAccessor="start"
                             endAccessor="end"
-                            onSelectEvent={event => alert(event.title)}
+                            onSelectEvent={(event) => this.handleSelect(event)}
                             onSelectSlot={this.choiceToggle}
-                            style={{ height: 500 }}
+                            style={{ height: 750 }}
                         />
                     </div>
                 </div>
-                <Sidebar planToggle={this.planToggle} planModal={this.state.planModal} workoutToggle={this.workoutToggle} workoutModal={this.state.workoutModal} />
+
+                <Sidebar createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} />
             </div>
         );
     }

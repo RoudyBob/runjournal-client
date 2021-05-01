@@ -90,3 +90,25 @@
   color: #7f7d7d !important;
   margin: 0 imp !important;
 }
+
+.rbc-event.plan {
+  background-color: orange;
+}
+
+.rbc-event.plan.rbc-selected {
+  background-color: orange;
+  outline: none;
+}
+
+.rbc-event.workout {
+  background-color: green;
+}
+
+.rbc-event.workout.rbc-selected {
+  background-color: green;
+  outline: none;
+}
+
+.rbc-day-bg.rbc-today {
+  background-color: indigo;
+}

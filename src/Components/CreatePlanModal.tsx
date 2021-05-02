@@ -31,7 +31,7 @@ class CreatePlanModal extends React.Component<CreatePlanModalProps, CreatePlanMo
         };
     }
 
-    handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
+    createPlan = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
         fetch(`${APIURL}/plan`, {
             method: 'POST',
@@ -63,7 +63,7 @@ class CreatePlanModal extends React.Component<CreatePlanModalProps, CreatePlanMo
                 <Modal isOpen={this.props.createPlanModal} toggle={() => this.props.createPlanToggle()} className="createplanmodal">
                 <ModalHeader toggle={() => this.props.createPlanToggle()}>Create Plan Entry</ModalHeader>
                 <ModalBody>
-                    <Form onSubmit={this.handleSubmit}>
+                    <Form onSubmit={this.createPlan}>
                         <div className="form-group">
                             <Label>Date</Label>
                             <input type="date" className="form-control" placeholder="01/01/1900" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ date: e.currentTarget.value })} required />

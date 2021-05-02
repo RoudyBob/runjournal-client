@@ -20,59 +20,41 @@ export interface MainProps {
 export interface MainState {
     createPlanModal: boolean,
     viewPlanModal: boolean,
-    selectedPlan: {
-        id: number,
-        date: string,
-        description: string,
-        type: string,
-        distance: number,
-        units: string,
-        notes: string
-    }
+    selectedPlan: planEvent,
     createWorkoutModal: boolean,
     viewWorkoutModal: boolean,
-    selectedWorkout: {
-        id: number,
-        timestamp: string,
-        description: string,
-        distance: number,
-        units: string,
-        movingtime: number,
-        elapsedtime: number,
-        elevationgain: number,
-        startlocation: Array<Number>,
-        endlocation: Array<Number>,
-        temp: number,
-        humidity: number,
-        aqi: number,
-        notes: string
-    }
+    selectedWorkout: workoutEvent,
     importModal: boolean,
     choiceModal: boolean,
-    events: [
-        {
-            start: Date | null,
-            end: Date | null,
-            title: string,
-            type: string,
-            id: Number,
-            allDay?: boolean,
-            resource?: any
-        }
-    ],
+    events: Array<calendarEvent>,
     description: string
 }
 
 export interface planEvent {
-    date: Date, 
+    id: number,
+    date: string,
     description: string,
-    id: Number
+    type: string,
+    distance: number,
+    units: string,
+    notes: string
 }
 
 export interface workoutEvent {
-    timestamp: Date, 
+    id: number,
+    timestamp: string,
     description: string,
-    id: Number
+    distance: number,
+    units: string,
+    movingtime: number,
+    elapsedtime: number,
+    elevationgain: number,
+    startlocation: Array<Number>,
+    endlocation: Array<Number>,
+    temp: number,
+    humidity: number,
+    aqi: number,
+    notes: string
 }
 
 export interface calendarEvent {
@@ -250,7 +232,7 @@ class Main extends React.Component<MainProps, MainState> {
         }));
     }
 
-    fetchPlans = () => {
+    fetchAllPlans = () => {
         fetch(`${APIURL}/plan/${this.props.userid}`, {
             method: 'GET',
             headers: new Headers ({
@@ -278,7 +260,7 @@ class Main extends React.Component<MainProps, MainState> {
 
     };
 
-    fetchWorkouts = () => {
+    fetchAllWorkouts = () => {
         fetch(`${APIURL}/workout/${this.props.userid}`, {
             method: 'GET',
             headers: new Headers ({
@@ -316,8 +298,23 @@ class Main extends React.Component<MainProps, MainState> {
     }
 
     componentDidMount() {
-        this.fetchPlans();
-        this.fetchWorkouts();
+        this.fetchAllPlans();
+        this.fetchAllWorkouts();
+        console.log(this.state.events);
+    }
+
+    updateSelectedPlan = (updatedPlan: planEvent) => {
+        this.setState({ 
+            selectedPlan: {
+                id: updatedPlan.id,
+                date: updatedPlan.date,
+                description: updatedPlan.description,
+                type: updatedPlan.type,
+                distance: updatedPlan.distance,
+                units: updatedPlan.units,
+                notes: updatedPlan.notes
+            }
+        })
     }
 
     render() { 
@@ -327,7 +324,7 @@ class Main extends React.Component<MainProps, MainState> {
             <div className="main-wrapper">
                 <CreatePlanModal token={this.props.token} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} />
                 <CreateWorkoutModal token={this.props.token} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} />
-                <ViewPlanModal token={this.props.token} viewPlanToggle={this.viewPlanToggle} viewPlanModal={this.state.viewPlanModal} selectedPlan={this.state.selectedPlan} />
+                <ViewPlanModal token={this.props.token} viewPlanToggle={this.viewPlanToggle} viewPlanModal={this.state.viewPlanModal} selectedPlan={this.state.selectedPlan} updateSelectedPlan={this.updateSelectedPlan} />
                 <ViewWorkoutModal token={this.props.token} viewWorkoutToggle={this.viewWorkoutToggle} viewWorkoutModal={this.state.viewWorkoutModal} selectedWorkout={this.state.selectedWorkout} />
                 <ImportModal token={this.props.token} importToggle={this.importToggle} importModal={this.state.importModal} />
                 <ChoiceModal choiceToggle={this.choiceToggle} createWorkoutToggle={this.createWorkoutToggle} createPlanToggle={this.createPlanToggle} choiceModal={this.state.choiceModal} />

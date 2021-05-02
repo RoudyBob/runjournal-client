@@ -44,7 +44,7 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
         };
     }
 
-    handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
+    createWorkout = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
         fetch(`${APIURL}/workout`, {
             method: 'POST',
@@ -83,7 +83,7 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
                 <Modal isOpen={this.props.createWorkoutModal} toggle={() => this.props.createWorkoutToggle()} className="createworkoutmodal">
                 <ModalHeader toggle={() => this.props.createWorkoutToggle()}>Create Workout Entry</ModalHeader>
                 <ModalBody>
-                <Form onSubmit={this.handleSubmit}>
+                <Form onSubmit={this.createWorkout}>
                         <div className="form-group">
                             <Label>Timestamp</Label>
                             <input type="datetime-local" className="form-control" placeholder="01/01/1900" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ timestamp: e.currentTarget.value })} required />

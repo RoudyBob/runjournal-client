@@ -1,11 +1,15 @@
 import * as React from 'react';
 import { Form, Label, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import APIURL from '../Helpers/environment';
+import { slotInfo, userInfo } from './Main';
 
 export interface CreateWorkoutModalProps {
     token: string,
     createWorkoutToggle: Function,
-    createWorkoutModal: boolean
+    createWorkoutModal: boolean,
+    selectedSlotInfo: slotInfo,
+    updateSelectedSlot: Function,
+    userSettings: userInfo
 }
  
 export interface CreateWorkoutModalState {
@@ -46,11 +50,13 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
 
     createWorkout = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
+        console.log(`Time entered: ${this.state.timestamp}`)
+        console.log(`Time converted to UTC: ${new Date(this.state.timestamp).toUTCString}`)
         fetch(`${APIURL}/workout`, {
             method: 'POST',
             body: JSON.stringify({
                 workout: {
-                    timestamp: this.state.timestamp,
+                    timestamp: new Date(this.props.selectedSlotInfo.start).toISOString(),
                     description: this.state.description,
                     distance: this.state.distance,
                     units: this.state.units,
@@ -73,20 +79,32 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
         .then((response) => response.json())
         .then((workout) => {
             console.log(workout)
-            this.props.createWorkoutToggle()
+            this.exitModal();
         })
     };
+
+    componentDidUpdate(prevProps: CreateWorkoutModalProps, prevState: CreateWorkoutModalState) {
+        if (prevProps.userSettings.defaultUnits !== this.props.userSettings.defaultUnits) {
+            this.setState({ units: this.props.userSettings.defaultUnits });
+        }
+
+    }
+
+    exitModal = () => {
+        this.setState({ units: this.props.userSettings.defaultUnits });
+        this.props.createWorkoutToggle();
+    }
 
     render() { 
         return (
             <div>
-                <Modal isOpen={this.props.createWorkoutModal} toggle={() => this.props.createWorkoutToggle()} className="createworkoutmodal">
-                <ModalHeader toggle={() => this.props.createWorkoutToggle()}>Create Workout Entry</ModalHeader>
+                <Modal isOpen={this.props.createWorkoutModal} toggle={() => this.exitModal()} className="createworkoutmodal">
+                <ModalHeader toggle={() => this.exitModal()}>Create Workout Entry</ModalHeader>
                 <ModalBody>
                 <Form onSubmit={this.createWorkout}>
                         <div className="form-group">
                             <Label>Timestamp</Label>
-                            <input type="datetime-local" className="form-control" placeholder="01/01/1900" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ timestamp: e.currentTarget.value })} required />
+                            <input type="datetime-local" className="form-control" value={new Date(this.props.selectedSlotInfo.start).toISOString().replace('Z', '')} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.props.updateSelectedSlot(e.currentTarget.value)} required />
                         </div>
 
                         <div className="form-group">
@@ -96,7 +114,7 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
 
                         <div className="form-group">
                             <label>Distance</label>
-                            <input type="number" className="form-control" placeholder="distance" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ distance: parseFloat(e.currentTarget.value) })} required />
+                            <input type="number" step=".01" className="form-control" placeholder="distance" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ distance: parseFloat(e.currentTarget.value) })} required />
                         </div>
 
                         <div className="form-group">
@@ -117,13 +135,9 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
                             <input type="text" className="form-control" placeholder="Notes" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ notes: e.currentTarget.value })} />
                         </div>
                         <Button color="primary">Save Plan Entry</Button>
-                        <Button color="secondary" onClick={() => this.props.createWorkoutToggle()}>Cancel</Button>
+                        <Button color="secondary" onClick={() => this.exitModal()}>Cancel</Button>
                     </Form>
                 </ModalBody>
-                {/* <ModalFooter>
-                    <Button color="primary" onClick={() => this.props.workoutToggle()}>Do Something</Button>{' '}
-                    <Button color="secondary" onClick={() => this.props.workoutToggle()}>Cancel</Button>
-                </ModalFooter> */}
                 </Modal>
             </div>
         );

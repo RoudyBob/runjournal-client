@@ -1,6 +1,8 @@
 import * as React from 'react';
+import { stringOrDate } from 'react-big-calendar';
 import { Form, Label, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import APIURL from '../Helpers/environment';
+import { userInfo } from './Main';
 
 export interface ViewPlanModalProps {
     token: string,
@@ -8,14 +10,15 @@ export interface ViewPlanModalProps {
     viewPlanModal: boolean,
     selectedPlan: {
         id: number,
-        date: string,
+        date: stringOrDate,
         description: string,
         type: string,
         distance: number,
         units: string,
         notes: string
     },
-    updateSelectedPlan: Function
+    updateSelectedPlan: Function,
+    userSettings: userInfo
 }
  
 export interface ViewPlanModalState {
@@ -164,16 +167,28 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
         this.props.updateSelectedPlan(updatedPlan);
     }
 
+    componentDidUpdate(prevProps: ViewPlanModalProps, prevState: ViewPlanModalState) {
+        if (prevProps.userSettings.defaultUnits !== this.props.userSettings.defaultUnits) {
+            this.setState({ units: this.props.userSettings.defaultUnits });
+        }
+
+    }
+
+    exitModal = () => {
+        this.setState({ units: this.props.userSettings.defaultUnits });
+        this.props.viewPlanToggle();
+    }
+
     render() { 
         return (
             <div>
-                <Modal isOpen={this.props.viewPlanModal} toggle={() => this.props.viewPlanToggle()} className="viewplanmodal">
-                <ModalHeader toggle={() => this.props.viewPlanToggle()}>View or Modify a Plan Entry</ModalHeader>
+                <Modal isOpen={this.props.viewPlanModal} toggle={() => this.exitModal()} className="viewplanmodal">
+                <ModalHeader toggle={() => this.exitModal()}>View or Modify a Plan Entry</ModalHeader>
                 <ModalBody>
                     <Form onSubmit={this.updatePlan}>
                         <div className="form-group">
                             <Label>Date</Label>
-                            <input type="date" className="form-control" value={this.props.selectedPlan.date} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.updateDate(e)} required />
+                            <input type="date" className="form-control" value={(this.props.selectedPlan.date).toString()} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.updateDate(e)} required />
                         </div>
 
                         <div className="form-group">
@@ -191,7 +206,7 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
 
                         <div className="form-group">
                             <label>Distance</label>
-                            <input type="number" className="form-control" value={this.props.selectedPlan.distance.toString()} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.updateDistance(e)} required />
+                            <input type="number" step=".01" className="form-control" value={this.props.selectedPlan.distance.toString()} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.updateDistance(e)} required />
                         </div>
 
                         <div className="form-group">
@@ -209,14 +224,10 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
                         <div className="input-button-row">
                             <Button color="primary">Save Changes</Button>
                             <Button color="danger" onClick={() => this.deletePlan()}>Delete Entry</Button>
-                            <Button color="secondary" onClick={() => this.props.viewPlanToggle()}>Cancel</Button>
+                            <Button color="secondary" onClick={() => this.exitModal()}>Cancel</Button>
                         </div>
                     </Form>
                 </ModalBody>
-                {/* <ModalFooter>
-                    <Button color="primary">Save Plan Entry</Button>
-                    <Button color="secondary" onClick={() => this.props.planToggle()}>Cancel</Button>
-                </ModalFooter> */}
                 </Modal>
          </div>
         );

@@ -20,7 +20,7 @@ class ChoiceModal extends React.Component<ChoiceModalProps, ChoiceModalState> {
     render() { 
         return (
             <div>
-                <Modal isOpen={this.props.choiceModal} toggle={() => this.props.choiceToggle()} className="choicemodal">
+                <Modal isOpen={this.props.choiceModal} toggle={() => this.props.choiceToggle} className="choicemodal">
                     <ModalHeader toggle={() => this.props.choiceToggle()}>Plan Entry or Workout?</ModalHeader>
                     <ModalBody>
                         <Button color="primary" onClick={() => this.props.createPlanToggle()}>Create Plan Entry</Button>

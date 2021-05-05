@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 export interface HomeProps {
-    token: string | null
+    token: string | null,
 }
  
 export interface HomeState {

@@ -4,7 +4,7 @@ import Login from './Login';
 import Signup from './Signup';
 
 export interface AuthProps {
-    updateToken: Function
+    updateToken: Function,
     showLogin: boolean
 }
  

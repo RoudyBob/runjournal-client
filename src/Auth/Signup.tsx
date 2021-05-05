@@ -4,7 +4,7 @@ import { Form, Label } from 'reactstrap';
 import APIURL from '../Helpers/environment';
 
 export interface SignupProps extends RouteComponentProps{
-    updateToken: Function
+    updateToken: Function,
 }
  
 export interface SignupState {
@@ -28,7 +28,7 @@ class Signup extends React.Component<SignupProps, SignupState> {
             password: '',
             birthdate: '',
             startOfWeek: 'monday',
-            defaultUnit: 'standard',
+            defaultUnit: 'mi',
             coach: false
         };
     }
@@ -106,9 +106,9 @@ class Signup extends React.Component<SignupProps, SignupState> {
 
                         <div className="form-group">
                             <label htmlFor="defaultunit">Default Unit:</label>
-                            <select className="form-control" id="defaultunit" value={this.state.defaultUnit} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => (e.currentTarget.value === "standard") ? this.setState({ defaultUnit: "standard"}) : this.setState({ defaultUnit: "metric" })}>
-                                <option value="standard">Standard</option>
-                                <option value="metric">Metric</option>
+                            <select className="form-control" id="defaultunit" value={this.state.defaultUnit} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => (e.currentTarget.value === "mi") ? this.setState({ defaultUnit: "mi"}) : this.setState({ defaultUnit: "km" })}>
+                                <option value="mi">mi</option>
+                                <option value="km">km</option>
                             </select>
                         </div>
 

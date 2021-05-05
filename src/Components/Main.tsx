@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Calendar, momentLocalizer } from 'react-big-calendar'
+import { Calendar, momentLocalizer, stringOrDate } from 'react-big-calendar'
 import moment from 'moment'
 import Sidebar from './Sidebar';
 import CreatePlanModal from './CreatePlanModal';
@@ -11,28 +11,33 @@ import ChoiceModal from './ChoiceModal';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import APIURL from '../Helpers/environment';
 
-
 export interface MainProps {
     token: string,
-    userid: string | null
+    userid: string | null,
 }
  
 export interface MainState {
+    userSettings: userInfo,
     createPlanModal: boolean,
     viewPlanModal: boolean,
-    selectedPlan: planEvent,
+    selectedPlan: planEntry,
     createWorkoutModal: boolean,
     viewWorkoutModal: boolean,
-    selectedWorkout: workoutEvent,
+    selectedWorkout: workoutEntry,
     importModal: boolean,
     choiceModal: boolean,
     events: Array<calendarEvent>,
-    description: string
+    selectedSlotInfo: slotInfo
 }
 
-export interface planEvent {
+export interface userInfo {
+    defaultUnits: string,
+    weekStart: string
+}
+
+export interface planEntry {
     id: number,
-    date: string,
+    date: stringOrDate,
     description: string,
     type: string,
     distance: number,
@@ -40,9 +45,14 @@ export interface planEvent {
     notes: string
 }
 
-export interface workoutEvent {
+export interface slotInfo {
+    start: stringOrDate,
+    end: stringOrDate
+}
+
+export interface workoutEntry {
     id: number,
-    timestamp: string,
+    timestamp: stringOrDate,
     description: string,
     distance: number,
     units: string,
@@ -58,19 +68,23 @@ export interface workoutEvent {
 }
 
 export interface calendarEvent {
-    start: Date | null,
-    end: Date | null,
+    start: stringOrDate | null,
+    end: stringOrDate | null,
     title: string,
     type: string,
     id: Number,
     allDay?: boolean,
     resource?: any
 }
- 
+
 class Main extends React.Component<MainProps, MainState> {
     constructor(props: MainProps) {
         super(props);
         this.state = { 
+            userSettings: {
+                defaultUnits: '',
+                weekStart: ''
+            },
             createPlanModal: false,
             viewPlanModal: false,
             selectedPlan: {
@@ -86,7 +100,7 @@ class Main extends React.Component<MainProps, MainState> {
             viewWorkoutModal: false,
             selectedWorkout: {
                 id: 0,
-                timestamp: '',
+                timestamp: new Date(),
                 description: '',
                 distance: 0,
                 units: '',
@@ -111,11 +125,22 @@ class Main extends React.Component<MainProps, MainState> {
                     id: 0
                 }
             ],
-            description: ''
+            selectedSlotInfo: {
+                start: new Date(),
+                end: new Date()
+            }
         };
     }
 
     createPlanToggle = () => {
+        var tmpDate = new Date();
+        tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
+        this.setState({
+            selectedSlotInfo: {
+                start: tmpDate.toISOString(),
+                end: tmpDate.toISOString()
+            }
+        })
         this.setState(prevState => ({
             createPlanModal: !prevState.createPlanModal
         }));
@@ -165,6 +190,14 @@ class Main extends React.Component<MainProps, MainState> {
     }
 
     createWorkoutToggle = () => {
+        var tmpDate = new Date();
+        tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
+        this.setState({
+            selectedSlotInfo: {
+                start: tmpDate.toISOString().split(":")[0] + ":" + tmpDate.toISOString().split(":")[1],
+                end: tmpDate.toISOString().split(":")[0] + ":" + tmpDate.toISOString().split(":")[1]
+            }
+        })
         this.setState(prevState => ({
             createWorkoutModal: !prevState.createWorkoutModal
         }));
@@ -202,7 +235,7 @@ class Main extends React.Component<MainProps, MainState> {
             this.setState({ 
                 selectedWorkout: {
                     id: workout.id,
-                    timestamp: workout.timestamp.toString().replace('Z', ''), //HTML input requires removing Z
+                    timestamp: new Date(new Date(workout.timestamp).toString().split('GMT')[0]+' UTC').toISOString().replace('Z', '').toString(), 
                     description: workout.description,
                     distance: workout.distance,
                     units: workout.units,
@@ -226,6 +259,22 @@ class Main extends React.Component<MainProps, MainState> {
         }));
     }
 
+    newEntry = ({ start, end } : slotInfo) => {
+        if (start) {
+            var tmpDate = new Date(start);
+            tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
+            this.setState({
+                selectedSlotInfo: {
+                    start: tmpDate.toISOString(),
+                    end: tmpDate.toISOString()
+                }
+            })
+        }
+        this.setState(prevState => ({
+            choiceModal: !prevState.choiceModal
+        }));
+    }
+
     choiceToggle = () => {
         this.setState(prevState => ({
             choiceModal: !prevState.choiceModal
@@ -243,10 +292,13 @@ class Main extends React.Component<MainProps, MainState> {
         .then((response) => response.json())
         .then((plans) => {
             var tmpPlans = this.state.events;
-            plans.forEach((plan: planEvent) =>{
+            console.log(plans);
+            plans.forEach((plan: planEntry) =>{
+                var tmpDate = new Date(plan.date);
+                tmpDate.setHours(tmpDate.getHours() + (new Date().getTimezoneOffset() / 60));
                 var newEvent = {
-                    start: new Date(plan.date),
-                    end: new Date(plan.date),
+                    start: tmpDate.toISOString(),
+                    end: tmpDate.toISOString(),
                     title: plan.description,
                     type: "plan",
                     id: plan.id
@@ -271,10 +323,11 @@ class Main extends React.Component<MainProps, MainState> {
         .then((response) => response.json())
         .then((workouts) => {
             var tmpWorkouts = this.state.events;
-            workouts.forEach((workout: workoutEvent) =>{
+            console.log(workouts);
+            workouts.forEach((workout: workoutEntry) =>{
                 var newEvent = {
-                    start: new Date(workout.timestamp),
-                    end: new Date(workout.timestamp),
+                    start: new Date(new Date(workout.timestamp).toString().split('GMT')[0]+' UTC').toISOString().replace('Z', '').toString(),
+                    end: new Date(new Date(workout.timestamp).toString().split('GMT')[0]+' UTC').toISOString().replace('Z', '').toString(),
                     title: workout.description,
                     type: "workout",
                     id: workout.id
@@ -297,13 +350,35 @@ class Main extends React.Component<MainProps, MainState> {
         }
     }
 
+    getUserSettings = () => {
+        fetch(`${APIURL}/user/${this.props.userid}`, {
+            method: 'GET',
+            headers: new Headers({
+                'Content-Type': 'application/json',
+                'Authorization': this.props.token
+            })
+        })
+        .then((response) => response.json())
+        .then((user) => {
+            console.log(user);
+            this.setState({
+                userSettings: {
+                    defaultUnits: user.defaultunits,
+                    weekStart: user.weekstart
+                }
+            })
+        })
+    }
+
     componentDidMount() {
         this.fetchAllPlans();
         this.fetchAllWorkouts();
+        this.getUserSettings();
         console.log(this.state.events);
+        console.log(this.props.token);
     }
 
-    updateSelectedPlan = (updatedPlan: planEvent) => {
+    updateSelectedPlan = (updatedPlan: planEntry) => {
         this.setState({ 
             selectedPlan: {
                 id: updatedPlan.id,
@@ -317,15 +392,47 @@ class Main extends React.Component<MainProps, MainState> {
         })
     }
 
+    updateSelectedWorkout = (updatedWorkout: workoutEntry) => {
+        this.setState({ 
+            selectedWorkout: {
+                id: updatedWorkout.id,
+                timestamp: updatedWorkout.timestamp,
+                description: updatedWorkout.description,
+                distance: updatedWorkout.distance,
+                units: updatedWorkout.units,
+                elapsedtime: updatedWorkout.elapsedtime,
+                notes: updatedWorkout.notes,
+                movingtime: this.state.selectedWorkout.movingtime,
+                elevationgain: this.state.selectedWorkout.elevationgain,
+                startlocation: this.state.selectedWorkout.startlocation,
+                endlocation: this.state.selectedWorkout.endlocation,
+                temp: this.state.selectedWorkout.temp,
+                humidity: this.state.selectedWorkout.humidity,
+                aqi: this.state.selectedWorkout.aqi
+            }
+        })
+    }
+
+    updateSelectedSlotInfo = (slotDateTime: stringOrDate) => {
+        var tmpDate = new Date(slotDateTime);
+        tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
+        this.setState({
+            selectedSlotInfo: {
+                start: tmpDate.toISOString(),
+                end: slotDateTime
+            }
+        })
+    }
+
     render() { 
         const localizer = momentLocalizer(moment);
 
         return (
             <div className="main-wrapper">
-                <CreatePlanModal token={this.props.token} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} />
-                <CreateWorkoutModal token={this.props.token} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} />
-                <ViewPlanModal token={this.props.token} viewPlanToggle={this.viewPlanToggle} viewPlanModal={this.state.viewPlanModal} selectedPlan={this.state.selectedPlan} updateSelectedPlan={this.updateSelectedPlan} />
-                <ViewWorkoutModal token={this.props.token} viewWorkoutToggle={this.viewWorkoutToggle} viewWorkoutModal={this.state.viewWorkoutModal} selectedWorkout={this.state.selectedWorkout} />
+                <CreatePlanModal token={this.props.token} userSettings={this.state.userSettings} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} updateSelectedSlot={this.updateSelectedSlotInfo} selectedSlotInfo={this.state.selectedSlotInfo} />
+                <CreateWorkoutModal token={this.props.token} userSettings={this.state.userSettings} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} updateSelectedSlot={this.updateSelectedSlotInfo} selectedSlotInfo={this.state.selectedSlotInfo} />
+                <ViewPlanModal token={this.props.token} userSettings={this.state.userSettings} viewPlanToggle={this.viewPlanToggle} viewPlanModal={this.state.viewPlanModal} selectedPlan={this.state.selectedPlan} updateSelectedPlan={this.updateSelectedPlan} />
+                <ViewWorkoutModal token={this.props.token} userSettings={this.state.userSettings} viewWorkoutToggle={this.viewWorkoutToggle} viewWorkoutModal={this.state.viewWorkoutModal} selectedWorkout={this.state.selectedWorkout} updateSelectedWorkout={this.updateSelectedWorkout} />
                 <ImportModal token={this.props.token} importToggle={this.importToggle} importModal={this.state.importModal} />
                 <ChoiceModal choiceToggle={this.choiceToggle} createWorkoutToggle={this.createWorkoutToggle} createPlanToggle={this.createPlanToggle} choiceModal={this.state.choiceModal} />
 
@@ -346,14 +453,17 @@ class Main extends React.Component<MainProps, MainState> {
                             }
                             startAccessor="start"
                             endAccessor="end"
+                            // onSelectSlot?: (slotInfo: { start: stringOrDate, end: stringOrDate, slots: Date[] | string[], action: 'select' | 'click' | 'doubleClick' }) => void;
+                            // onDoubleClickEvent?: (event: Object, e: React.SyntheticEvent<HTMLElement>) => void;
+                            // onSelectEvent?: (event: Object, e: React.SyntheticEvent<HTMLElement>) => void;
                             onSelectEvent={(event) => this.handleSelect(event)}
-                            onSelectSlot={this.choiceToggle}
+                            onSelectSlot={({start, end}) => {this.newEntry({start, end})}}
                             style={{ height: 750 }}
                         />
                     </div>
                 </div>
 
-                <Sidebar createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} />
+                <Sidebar token={this.props.token} userid={this.props.userid} userSettings={this.state.userSettings} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} />
             </div>
         );
     }

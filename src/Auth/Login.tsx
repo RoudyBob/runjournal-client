@@ -4,7 +4,7 @@ import { Form } from 'reactstrap';
 import APIURL from '../Helpers/environment';
 
 export interface LoginProps extends RouteComponentProps{
-    updateToken: Function
+    updateToken: Function,
 }
  
 export interface LoginState {

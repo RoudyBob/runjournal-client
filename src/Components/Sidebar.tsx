@@ -74,8 +74,6 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
 
 
     calculateGoalCountdown = () => {
-
-
         fetch(`${APIURL}/plan/${this.props.userid}`, {
             method: 'GET',
             headers: new Headers ({

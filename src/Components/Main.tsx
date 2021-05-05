@@ -42,7 +42,8 @@ export interface planEntry {
     type: string,
     distance: number,
     units: string,
-    notes: string
+    notes: string,
+    userId: number
 }
 
 export interface slotInfo {
@@ -72,7 +73,7 @@ export interface calendarEvent {
     end: stringOrDate | null,
     title: string,
     type: string,
-    id: Number,
+    id: number,
     allDay?: boolean,
     resource?: any
 }
@@ -94,7 +95,8 @@ class Main extends React.Component<MainProps, MainState> {
                 type: '',
                 distance: 0,
                 units: '',
-                notes: ''
+                notes: '',
+                userId: 0
             },
             createWorkoutModal: false,
             viewWorkoutModal: false,
@@ -133,7 +135,7 @@ class Main extends React.Component<MainProps, MainState> {
     }
 
     createPlanToggle = () => {
-        var tmpDate = new Date();
+        var tmpDate = new Date(this.state.selectedSlotInfo.start);
         tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
         this.setState({
             selectedSlotInfo: {
@@ -164,7 +166,7 @@ class Main extends React.Component<MainProps, MainState> {
         };
     }
 
-    fetchPlan = (id: Number) => {
+    fetchPlan = (id: number) => {
         fetch(`${APIURL}/plan/get/${id}`, {
             method: 'GET',
             headers: new Headers ({
@@ -174,7 +176,7 @@ class Main extends React.Component<MainProps, MainState> {
         })
         .then((response) => response.json())
         .then((plan) => {
-            console.log(plan);
+            console.log(plan)
             this.setState({ 
                 selectedPlan: {
                     id: plan.id,
@@ -183,14 +185,16 @@ class Main extends React.Component<MainProps, MainState> {
                     type: plan.type,
                     distance: plan.distance,
                     units: plan.units,
-                    notes: plan.notes
+                    notes: plan.notes,
+                    userId: plan.userId
                 }
             });
         });
+        this.viewPlanToggle();
     }
 
     createWorkoutToggle = () => {
-        var tmpDate = new Date();
+        var tmpDate = new Date(this.state.selectedSlotInfo.start);
         tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
         this.setState({
             selectedSlotInfo: {
@@ -221,7 +225,7 @@ class Main extends React.Component<MainProps, MainState> {
         };
     }
 
-    fetchWorkout = (id: Number) => {
+    fetchWorkout = (id: number) => {
         fetch(`${APIURL}/workout/get/${id}`, {
             method: 'GET',
             headers: new Headers ({
@@ -251,6 +255,7 @@ class Main extends React.Component<MainProps, MainState> {
                 }
             });
         });
+        this.viewWorkoutToggle();
     }
 
     importToggle = () => {
@@ -260,19 +265,16 @@ class Main extends React.Component<MainProps, MainState> {
     }
 
     newEntry = ({ start, end } : slotInfo) => {
-        if (start) {
-            var tmpDate = new Date(start);
-            tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
-            this.setState({
-                selectedSlotInfo: {
-                    start: tmpDate.toISOString(),
-                    end: tmpDate.toISOString()
-                }
-            })
-        }
-        this.setState(prevState => ({
-            choiceModal: !prevState.choiceModal
-        }));
+
+        var tmpDate = new Date(start);
+        tmpDate.setHours(tmpDate.getHours() + (new Date().getTimezoneOffset() / 60));
+        this.setState({
+            selectedSlotInfo: {
+                start: tmpDate.toISOString().replace('Z', ''),
+                end: tmpDate.toISOString().replace('Z', '')
+            }
+        })
+        this.choiceToggle();
     }
 
     choiceToggle = () => {
@@ -341,12 +343,11 @@ class Main extends React.Component<MainProps, MainState> {
     };
 
     handleSelect = (event: calendarEvent) => {
+        console.log(`Select Event: ${event}`);
         if (event.type === "plan") {
             this.fetchPlan(event.id);
-            this.viewPlanToggle();
         } else {
             this.fetchWorkout(event.id);
-            this.viewWorkoutToggle();
         }
     }
 
@@ -360,6 +361,7 @@ class Main extends React.Component<MainProps, MainState> {
         })
         .then((response) => response.json())
         .then((user) => {
+            console.log('User Object:')
             console.log(user);
             this.setState({
                 userSettings: {
@@ -374,8 +376,8 @@ class Main extends React.Component<MainProps, MainState> {
         this.fetchAllPlans();
         this.fetchAllWorkouts();
         this.getUserSettings();
+        console.log(`Events Array:`)
         console.log(this.state.events);
-        console.log(this.props.token);
     }
 
     updateSelectedPlan = (updatedPlan: planEntry) => {
@@ -387,7 +389,8 @@ class Main extends React.Component<MainProps, MainState> {
                 type: updatedPlan.type,
                 distance: updatedPlan.distance,
                 units: updatedPlan.units,
-                notes: updatedPlan.notes
+                notes: updatedPlan.notes,
+                userId: updatedPlan.userId
             }
         })
     }
@@ -419,9 +422,12 @@ class Main extends React.Component<MainProps, MainState> {
         this.setState({
             selectedSlotInfo: {
                 start: tmpDate.toISOString(),
-                end: slotDateTime
+                end: tmpDate.toISOString()
             }
         })
+    }
+
+    componentDidUpdate(prevProps : MainProps, prevState: MainState) {
     }
 
     render() { 

@@ -2,28 +2,13 @@ import * as React from 'react';
 import { stringOrDate } from 'react-big-calendar';
 import { Form, Label, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import APIURL from '../Helpers/environment';
-import { userInfo } from './Main';
+import { userInfo, workoutEntry } from './Main';
 
 export interface ViewWorkoutModalProps {
     token: string,
     viewWorkoutToggle: Function,
     viewWorkoutModal: boolean,
-    selectedWorkout: {
-        id: number,
-        timestamp: stringOrDate,
-        description: string,
-        distance: number,
-        units: string,
-        movingtime: number,
-        elapsedtime: number,
-        elevationgain: number,
-        startlocation: Array<Number>,
-        endlocation: Array<Number>,
-        temp: number,
-        humidity: number,
-        aqi: number,
-        notes: string
-    },
+    selectedWorkout: workoutEntry,
     updateSelectedWorkout: Function,
     userSettings: userInfo
 }
@@ -193,7 +178,7 @@ class ViewWorkoutModal extends React.Component<ViewWorkoutModalProps, ViewWorkou
         }
 
     }
-    
+
     exitModal = () => {
         this.setState({ units: this.props.userSettings.defaultUnits });
         this.props.viewWorkoutToggle();

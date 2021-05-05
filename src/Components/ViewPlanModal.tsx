@@ -2,21 +2,13 @@ import * as React from 'react';
 import { stringOrDate } from 'react-big-calendar';
 import { Form, Label, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import APIURL from '../Helpers/environment';
-import { userInfo } from './Main';
+import { planEntry, userInfo } from './Main';
 
 export interface ViewPlanModalProps {
     token: string,
     viewPlanToggle: Function,
     viewPlanModal: boolean,
-    selectedPlan: {
-        id: number,
-        date: stringOrDate,
-        description: string,
-        type: string,
-        distance: number,
-        units: string,
-        notes: string
-    },
+    selectedPlan: planEntry,
     updateSelectedPlan: Function,
     userSettings: userInfo
 }
@@ -54,7 +46,8 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
                     type: this.props.selectedPlan.type, 
                     distance: this.props.selectedPlan.distance,
                     units: this.props.selectedPlan.units,
-                    notes: this.props.selectedPlan.notes
+                    notes: this.props.selectedPlan.notes,
+                    userId: this.props.selectedPlan.userId,
                 }
             }),
             headers: new Headers({
@@ -70,7 +63,6 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
     }
 
     deletePlan = () => {
-        console.log(`${APIURL}/plan/${this.props.selectedPlan.id}`);
         fetch(`${APIURL}/plan/${this.props.selectedPlan.id}`, {
             method: 'DELETE',
             headers: new Headers({
@@ -93,7 +85,8 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
             type: this.props.selectedPlan.type,
             distance: this.props.selectedPlan.distance,
             units: this.props.selectedPlan.units,
-            notes: this.props.selectedPlan.notes
+            notes: this.props.selectedPlan.notes,
+            userId: this.props.selectedPlan.userId
         }
         this.props.updateSelectedPlan(updatedPlan);
     }
@@ -106,7 +99,8 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
             type: this.props.selectedPlan.type,
             distance: this.props.selectedPlan.distance,
             units: this.props.selectedPlan.units,
-            notes: this.props.selectedPlan.notes
+            notes: this.props.selectedPlan.notes,
+            userId: this.props.selectedPlan.userId
         }
         this.props.updateSelectedPlan(updatedPlan);
     }
@@ -121,7 +115,8 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
             type: type,
             distance: this.props.selectedPlan.distance,
             units: this.props.selectedPlan.units,
-            notes: this.props.selectedPlan.notes
+            notes: this.props.selectedPlan.notes,
+            userId: this.props.selectedPlan.userId
         }
         this.props.updateSelectedPlan(updatedPlan);
     }
@@ -134,7 +129,8 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
             type: this.props.selectedPlan.type,
             distance: parseFloat(e.currentTarget.value),
             units: this.props.selectedPlan.units,
-            notes: this.props.selectedPlan.notes
+            notes: this.props.selectedPlan.notes,
+            userId: this.props.selectedPlan.userId
         }
         this.props.updateSelectedPlan(updatedPlan);
     }
@@ -149,7 +145,8 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
             type: this.props.selectedPlan.type,
             distance: this.props.selectedPlan.distance,
             units: units,
-            notes: this.props.selectedPlan.notes
+            notes: this.props.selectedPlan.notes,
+            userId: this.props.selectedPlan.userId
         }
         this.props.updateSelectedPlan(updatedPlan);
     }
@@ -162,7 +159,8 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
             type: this.props.selectedPlan.type,
             distance: this.props.selectedPlan.distance,
             units: this.props.selectedPlan.units,
-            notes: e.currentTarget.value
+            notes: e.currentTarget.value,
+            userId: this.props.selectedPlan.userId
         }
         this.props.updateSelectedPlan(updatedPlan);
     }
@@ -170,6 +168,9 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
     componentDidUpdate(prevProps: ViewPlanModalProps, prevState: ViewPlanModalState) {
         if (prevProps.userSettings.defaultUnits !== this.props.userSettings.defaultUnits) {
             this.setState({ units: this.props.userSettings.defaultUnits });
+        }
+        if (prevProps.selectedPlan.date !== this.props.selectedPlan.date) {
+            console.log(`date props updated: ${this.props.selectedPlan.date }`);
         }
 
     }

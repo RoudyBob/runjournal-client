@@ -49,72 +49,52 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
 
     calculateGoalCountdown = () => {
         var raceDateHolder : stringOrDate = new Date('2100-01-01');
-        var raceNameHolder: string = '';
+        var raceNameHolder : string = '';
+        var raceFound : boolean = false;
         this.props.allPlans.forEach((plan: planEntry) => {
             // var raceDate : stringOrDate = '';
             if (plan.type === "race") {
-                // console.log(raceDateHolder);
-                // console.log(`plan date: ${Date.parse(plan.date.toString())}`);
-                // console.log(`existing race date: ${Date.parse(raceDateHolder.toString())}`);
                 if(Date.parse(plan.date.toString()) < Date.parse(raceDateHolder.toString())) {
-                    console.log(`found a newer race: ${plan.description}`);
+                    raceFound = true;
                     raceDateHolder = plan.date;
                     raceNameHolder = plan.description;
                 }
-
-                // if (Date.parse(plan.date.toString()) < Date.parse(raceDate) || raceDate === '') {
-                //     raceDate = plan.date
-                // }
-                // if (!this.state.nextRaceDate) {
-                //     console.log('adding first date and description to state');
-                //     console.log(plan.date, plan.description);
-                //     this.setState({ nextRaceDate: plan.date });
-                //     this.setState({ nextRaceName: plan.description })
-                // } else {
-                //     console.log('found another race')
-                //     if (Date.parse(plan.date.toString()) < Date.parse(this.state.nextRaceDate.toString())) {
-                //         this.setState({ nextRaceDate: plan.date })
-                //         this.setState({ nextRaceName: plan.description })
-                //     }
-                // }
             }
 
         });
-        console.log(raceNameHolder, raceDateHolder);
-        console.log(typeof(raceNameHolder), typeof(raceDateHolder))
-        this.setState({
-            nextRaceDate: raceDateHolder,
-            nextRaceName: raceNameHolder
-        })
 
-        // Convert today to Unix timestamp
-        let today = new Date().getTime() / 1000;
+        if (!raceFound) {
+            this.setState({ nextRaceName: "N/A" });
+            this.setState({ nextRaceDate: "None Found" })
+            this.setState({ weeksUntilRace: 0 });
+            this.setState({ daysUntilRace: 0 });
+            this.setState({ hoursUntilRace: 0 });
+        } else {
+            this.setState({
+                nextRaceDate: raceDateHolder,
+                nextRaceName: raceNameHolder
+            })
+            // Convert today to Unix timestamp
+            let today = new Date().getTime() / 1000;
 
-        // Get delta between Today and Next Race
-        let delta = Math.abs(new Date(this.state.nextRaceDate).getTime() / 1000) - today;
+            // Get delta between Today and Next Race
+            let delta = Math.abs(new Date(raceDateHolder).getTime() / 1000) - today;
 
-        // calculate and subtrace whole weeks
-        let weeks = Math.floor(delta / 604800);
-        this.setState({ weeksUntilRace: weeks });
-        delta -= weeks * 604800;
+            // calculate and subtrace whole weeks
+            let weeks = Math.floor(delta / 604800);
+            this.setState({ weeksUntilRace: weeks });
+            delta -= weeks * 604800;
 
-        // calculate and subtract whole days
-        let days = Math.floor(delta / 86400);
-        this.setState({ daysUntilRace: days });
-        delta -= days * 86400;
+            // calculate and subtract whole days
+            let days = Math.floor(delta / 86400);
+            this.setState({ daysUntilRace: days });
+            delta -= days * 86400;
 
-        // caleculate and subtract whole hours
-        let hours = Math.floor(delta / 3600) % 24;
-        this.setState({ hoursUntilRace: hours });
-        delta -= hours * 3600;
-
-        // if (!this.state.nextRaceDate) {
-        //     this.setState({ nextRaceName: "N/A" });
-        //     this.setState({ nextRaceDate: "None Found" })
-        //     this.setState({ weeksUntilRace: 0 });
-        //     this.setState({ daysUntilRace: 0 });
-        //     this.setState({ hoursUntilRace: 0 });
-        // }
+            // caleculate and subtract whole hours
+            let hours = Math.floor(delta / 3600) % 24;
+            this.setState({ hoursUntilRace: hours });
+            delta -= hours * 3600;
+        }
     };
 
     calculateStats = () => {
@@ -150,9 +130,6 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
         }
         if (prevProps.allPlans !== this.props.allPlans) {
             this.calculateGoalCountdown();
-        }
-        if (prevState.nextRaceDate !== this.state.nextRaceDate) {
-            console.log('race date change!')
         }
     }
 

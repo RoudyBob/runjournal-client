@@ -10,7 +10,8 @@ export interface CreatePlanModalProps {
     createPlanModal: boolean,
     selectedSlotInfo: slotInfo,
     updateSelectedSlot: Function
-    userSettings: userInfo
+    userSettings: userInfo,
+    updateEvents: Function
 }
  
 export interface CreatePlanModalState {
@@ -42,7 +43,7 @@ class CreatePlanModal extends React.Component<CreatePlanModalProps, CreatePlanMo
             method: 'POST',
             body: JSON.stringify({
                 plan: {
-                    date: new Date(this.props.selectedSlotInfo.start).toISOString(),
+                    date: this.props.selectedSlotInfo.start,
                     description: this.state.description,
                     type: this.state.type, 
                     distance: this.state.distance,
@@ -57,7 +58,8 @@ class CreatePlanModal extends React.Component<CreatePlanModalProps, CreatePlanMo
         })
         .then((response) => response.json())
         .then((plan) => {
-            console.log(plan)
+            // console.log(plan)
+            this.props.updateEvents();
             this.exitModal();
         })
 
@@ -83,7 +85,7 @@ class CreatePlanModal extends React.Component<CreatePlanModalProps, CreatePlanMo
                     <Form onSubmit={this.createPlan}>
                         <div className="form-group">
                             <Label>Date</Label>
-                            <input type="date" className="form-control" value={new Date(this.props.selectedSlotInfo.start).toISOString().split("T")[0]} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.props.updateSelectedSlot(e.currentTarget.value)} required />
+                            <input type="date" className="form-control" value={(this.props.selectedSlotInfo.start).toString().split("T")[0]} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.props.updateSelectedSlot(e.currentTarget.value)} required />
                         </div>
 
                         <div className="form-group">

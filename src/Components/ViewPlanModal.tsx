@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { stringOrDate } from 'react-big-calendar';
 import { Form, Label, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import APIURL from '../Helpers/environment';
 import { planEntry, userInfo } from './Main';
@@ -10,7 +9,8 @@ export interface ViewPlanModalProps {
     viewPlanModal: boolean,
     selectedPlan: planEntry,
     updateSelectedPlan: Function,
-    userSettings: userInfo
+    userSettings: userInfo,
+    updateEvents: Function
 }
  
 export interface ViewPlanModalState {
@@ -57,7 +57,8 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
         })
         .then((response) => response.json())
         .then((data) => {
-            console.log(data)
+            // console.log(data)
+            this.props.updateEvents();
             this.props.viewPlanToggle()
         })
     }
@@ -72,7 +73,8 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
         })
         .then((response) => response.json())
         .then((data) => {
-            console.log(data)
+            // console.log(data)
+            this.props.updateEvents();
             this.props.viewPlanToggle()
         })
     }
@@ -169,10 +171,6 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
         if (prevProps.userSettings.defaultUnits !== this.props.userSettings.defaultUnits) {
             this.setState({ units: this.props.userSettings.defaultUnits });
         }
-        if (prevProps.selectedPlan.date !== this.props.selectedPlan.date) {
-            console.log(`date props updated: ${this.props.selectedPlan.date }`);
-        }
-
     }
 
     exitModal = () => {

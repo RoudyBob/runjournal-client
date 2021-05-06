@@ -9,7 +9,8 @@ export interface CreateWorkoutModalProps {
     createWorkoutModal: boolean,
     selectedSlotInfo: slotInfo,
     updateSelectedSlot: Function,
-    userSettings: userInfo
+    userSettings: userInfo,
+    updateEvents: Function
 }
  
 export interface CreateWorkoutModalState {
@@ -50,13 +51,13 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
 
     createWorkout = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(`Time entered: ${this.state.timestamp}`)
-        console.log(`Time converted to UTC: ${new Date(this.state.timestamp).toUTCString}`)
+        var tmpDate = new Date(this.props.selectedSlotInfo.start);
+        tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
         fetch(`${APIURL}/workout`, {
             method: 'POST',
             body: JSON.stringify({
                 workout: {
-                    timestamp: new Date(this.props.selectedSlotInfo.start).toISOString(),
+                    timestamp: this.props.selectedSlotInfo.start,
                     description: this.state.description,
                     distance: this.state.distance,
                     units: this.state.units,
@@ -78,7 +79,8 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
         })
         .then((response) => response.json())
         .then((workout) => {
-            console.log(workout)
+            // console.log(workout)
+            this.props.updateEvents();
             this.exitModal();
         })
     };
@@ -104,7 +106,7 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
                 <Form onSubmit={this.createWorkout}>
                         <div className="form-group">
                             <Label>Timestamp</Label>
-                            <input type="datetime-local" className="form-control" value={new Date(this.props.selectedSlotInfo.start).toISOString().replace('Z', '')} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.props.updateSelectedSlot(e.currentTarget.value)} required />
+                            <input type="datetime-local" className="form-control" value={this.props.selectedSlotInfo.start.toString().split(":")[0] + ":" + this.props.selectedSlotInfo.start.toString().toString().split(":")[1]} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.props.updateSelectedSlot(e.currentTarget.value)} required />
                         </div>
 
                         <div className="form-group">

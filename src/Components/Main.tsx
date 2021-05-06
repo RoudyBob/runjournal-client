@@ -27,7 +27,9 @@ export interface MainState {
     importModal: boolean,
     choiceModal: boolean,
     events: Array<calendarEvent>,
-    selectedSlotInfo: slotInfo
+    selectedSlotInfo: slotInfo,
+    allWorkouts: Array<workoutEntry>,
+    allPlans: Array<planEntry>
 }
 
 export interface userInfo {
@@ -102,7 +104,7 @@ class Main extends React.Component<MainProps, MainState> {
             viewWorkoutModal: false,
             selectedWorkout: {
                 id: 0,
-                timestamp: new Date(),
+                timestamp: '',
                 description: '',
                 distance: 0,
                 units: '',
@@ -118,31 +120,65 @@ class Main extends React.Component<MainProps, MainState> {
             },
             importModal: false,
             choiceModal: false,
-            events: [
-                {
-                    start: null,
-                    end: null,
-                    title: '',
-                    type: '',
-                    id: 0
-                }
-            ],
+            events: [{
+                start: null,
+                end: null,
+                title: '',
+                type: '',
+                id: 0
+            }],
+            allPlans: [{
+                id: 0,
+                date: '',
+                description: '',
+                type: '',
+                distance: 0,
+                units: '',
+                notes: '',
+                userId: 0
+            }],
+            allWorkouts: [{
+                id: 0,
+                timestamp: '',
+                description: '',
+                distance: 0,
+                units: '',
+                movingtime: 0,
+                elapsedtime: 0,
+                elevationgain: 0,
+                startlocation: [],
+                endlocation: [],
+                temp: 0,
+                humidity: 0,
+                aqi: 0,
+                notes: ''
+            }],
             selectedSlotInfo: {
-                start: new Date(),
-                end: new Date()
+                start: '',
+                end: ''
             }
         };
     }
 
     createPlanToggle = () => {
-        var tmpDate = new Date(this.state.selectedSlotInfo.start);
-        tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
-        this.setState({
-            selectedSlotInfo: {
-                start: tmpDate.toISOString(),
-                end: tmpDate.toISOString()
-            }
-        })
+        if (this.state.selectedSlotInfo.start) {
+            let tmpDate = new Date(this.state.selectedSlotInfo.start);
+            this.setState({
+                selectedSlotInfo: {
+                    start: tmpDate.toISOString(),
+                    end: tmpDate.toISOString()
+                }
+            })
+        } else {
+            let tmpDate = new Date();
+            this.setState({
+                selectedSlotInfo: {
+                    start: tmpDate.toISOString(),
+                    end: tmpDate.toISOString()
+                }
+            })
+        }
+
         this.setState(prevState => ({
             createPlanModal: !prevState.createPlanModal
         }));
@@ -176,7 +212,7 @@ class Main extends React.Component<MainProps, MainState> {
         })
         .then((response) => response.json())
         .then((plan) => {
-            console.log(plan)
+            // console.log(plan)
             this.setState({ 
                 selectedPlan: {
                     id: plan.id,
@@ -194,14 +230,15 @@ class Main extends React.Component<MainProps, MainState> {
     }
 
     createWorkoutToggle = () => {
-        var tmpDate = new Date(this.state.selectedSlotInfo.start);
-        tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
+        let tmpDate = new Date().toISOString().split("T")[0] + "T00:00";
+        if (!this.state.selectedSlotInfo.start) {
         this.setState({
             selectedSlotInfo: {
-                start: tmpDate.toISOString().split(":")[0] + ":" + tmpDate.toISOString().split(":")[1],
-                end: tmpDate.toISOString().split(":")[0] + ":" + tmpDate.toISOString().split(":")[1]
+                start: tmpDate,
+                end: tmpDate
             }
-        })
+        });
+        }
         this.setState(prevState => ({
             createWorkoutModal: !prevState.createWorkoutModal
         }));
@@ -235,7 +272,7 @@ class Main extends React.Component<MainProps, MainState> {
         })
         .then((response) => response.json())
         .then((workout) => {
-            console.log(workout);
+            // console.log(workout);
             this.setState({ 
                 selectedWorkout: {
                     id: workout.id,
@@ -265,15 +302,14 @@ class Main extends React.Component<MainProps, MainState> {
     }
 
     newEntry = ({ start, end } : slotInfo) => {
-
         var tmpDate = new Date(start);
-        tmpDate.setHours(tmpDate.getHours() + (new Date().getTimezoneOffset() / 60));
+        tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
         this.setState({
             selectedSlotInfo: {
-                start: tmpDate.toISOString().replace('Z', ''),
-                end: tmpDate.toISOString().replace('Z', '')
+                start: tmpDate.toISOString().split(":")[0] + ":" + tmpDate.toISOString().split(":")[1],
+                end: tmpDate.toISOString().split(":")[0] + ":" + tmpDate.toISOString().split(":")[1]
             }
-        })
+        });
         this.choiceToggle();
     }
 
@@ -293,8 +329,9 @@ class Main extends React.Component<MainProps, MainState> {
         })
         .then((response) => response.json())
         .then((plans) => {
+            // console.log(plans);
             var tmpPlans = this.state.events;
-            console.log(plans);
+            this.setState({ allPlans: plans });
             plans.forEach((plan: planEntry) =>{
                 var tmpDate = new Date(plan.date);
                 tmpDate.setHours(tmpDate.getHours() + (new Date().getTimezoneOffset() / 60));
@@ -306,7 +343,6 @@ class Main extends React.Component<MainProps, MainState> {
                     id: plan.id
                 }
                 tmpPlans.push(newEvent);
-                // console.log(`${plan.id} starts on ${newEvent.start}`);
             });
 
             this.setState({ events: tmpPlans });
@@ -324,8 +360,9 @@ class Main extends React.Component<MainProps, MainState> {
         })
         .then((response) => response.json())
         .then((workouts) => {
+            // console.log(workouts);
             var tmpWorkouts = this.state.events;
-            console.log(workouts);
+            this.setState({ allWorkouts: workouts })
             workouts.forEach((workout: workoutEntry) =>{
                 var newEvent = {
                     start: new Date(new Date(workout.timestamp).toString().split('GMT')[0]+' UTC').toISOString().replace('Z', '').toString(),
@@ -335,7 +372,6 @@ class Main extends React.Component<MainProps, MainState> {
                     id: workout.id
                 }
                 tmpWorkouts.push(newEvent);
-                // console.log(`${plan.id} starts on ${newEvent.start}`);
             });
             this.setState({ events: tmpWorkouts });
         })
@@ -343,7 +379,6 @@ class Main extends React.Component<MainProps, MainState> {
     };
 
     handleSelect = (event: calendarEvent) => {
-        console.log(`Select Event: ${event}`);
         if (event.type === "plan") {
             this.fetchPlan(event.id);
         } else {
@@ -361,8 +396,7 @@ class Main extends React.Component<MainProps, MainState> {
         })
         .then((response) => response.json())
         .then((user) => {
-            console.log('User Object:')
-            console.log(user);
+            // console.log(user);
             this.setState({
                 userSettings: {
                     defaultUnits: user.defaultunits,
@@ -376,8 +410,6 @@ class Main extends React.Component<MainProps, MainState> {
         this.fetchAllPlans();
         this.fetchAllWorkouts();
         this.getUserSettings();
-        console.log(`Events Array:`)
-        console.log(this.state.events);
     }
 
     updateSelectedPlan = (updatedPlan: planEntry) => {
@@ -416,9 +448,9 @@ class Main extends React.Component<MainProps, MainState> {
         })
     }
 
-    updateSelectedSlotInfo = (slotDateTime: stringOrDate) => {
+    updateSelectedPlanSlotInfo = (slotDateTime: stringOrDate) => {
         var tmpDate = new Date(slotDateTime);
-        tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
+        // tmpDate.setHours(tmpDate.getHours() + (new Date().getTimezoneOffset() / 60));
         this.setState({
             selectedSlotInfo: {
                 start: tmpDate.toISOString(),
@@ -426,6 +458,24 @@ class Main extends React.Component<MainProps, MainState> {
             }
         })
     }
+
+    updateSelectedWorkoutSlotInfo = (slotDateTime: stringOrDate) => {
+        var tmpDate = new Date(slotDateTime);
+        tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
+        this.setState({
+            selectedSlotInfo: {
+                start: tmpDate.toISOString().split(":")[0] + ":" + tmpDate.toISOString().split(":")[1],
+                end: tmpDate.toISOString().split(":")[0] + ":" + tmpDate.toISOString().split(":")[1],
+            }
+        })
+    }
+
+    updateEvents = () => {
+        this.setState({events: []});
+        this.fetchAllPlans();
+        this.fetchAllWorkouts();
+    }
+
 
     componentDidUpdate(prevProps : MainProps, prevState: MainState) {
     }
@@ -435,10 +485,10 @@ class Main extends React.Component<MainProps, MainState> {
 
         return (
             <div className="main-wrapper">
-                <CreatePlanModal token={this.props.token} userSettings={this.state.userSettings} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} updateSelectedSlot={this.updateSelectedSlotInfo} selectedSlotInfo={this.state.selectedSlotInfo} />
-                <CreateWorkoutModal token={this.props.token} userSettings={this.state.userSettings} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} updateSelectedSlot={this.updateSelectedSlotInfo} selectedSlotInfo={this.state.selectedSlotInfo} />
-                <ViewPlanModal token={this.props.token} userSettings={this.state.userSettings} viewPlanToggle={this.viewPlanToggle} viewPlanModal={this.state.viewPlanModal} selectedPlan={this.state.selectedPlan} updateSelectedPlan={this.updateSelectedPlan} />
-                <ViewWorkoutModal token={this.props.token} userSettings={this.state.userSettings} viewWorkoutToggle={this.viewWorkoutToggle} viewWorkoutModal={this.state.viewWorkoutModal} selectedWorkout={this.state.selectedWorkout} updateSelectedWorkout={this.updateSelectedWorkout} />
+                <CreatePlanModal token={this.props.token} userSettings={this.state.userSettings} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} updateSelectedSlot={this.updateSelectedPlanSlotInfo} selectedSlotInfo={this.state.selectedSlotInfo} updateEvents={this.updateEvents}/>
+                <CreateWorkoutModal token={this.props.token} userSettings={this.state.userSettings} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} updateSelectedSlot={this.updateSelectedWorkoutSlotInfo} selectedSlotInfo={this.state.selectedSlotInfo} updateEvents={this.updateEvents}/>
+                <ViewPlanModal token={this.props.token} userSettings={this.state.userSettings} viewPlanToggle={this.viewPlanToggle} viewPlanModal={this.state.viewPlanModal} selectedPlan={this.state.selectedPlan} updateSelectedPlan={this.updateSelectedPlan} updateEvents={this.updateEvents} />
+                <ViewWorkoutModal token={this.props.token} userSettings={this.state.userSettings} viewWorkoutToggle={this.viewWorkoutToggle} viewWorkoutModal={this.state.viewWorkoutModal} selectedWorkout={this.state.selectedWorkout} updateSelectedWorkout={this.updateSelectedWorkout} updateEvents={this.updateEvents} />
                 <ImportModal token={this.props.token} importToggle={this.importToggle} importModal={this.state.importModal} />
                 <ChoiceModal choiceToggle={this.choiceToggle} createWorkoutToggle={this.createWorkoutToggle} createPlanToggle={this.createPlanToggle} choiceModal={this.state.choiceModal} />
 
@@ -446,6 +496,7 @@ class Main extends React.Component<MainProps, MainState> {
                     <div className="calendar-wrapper">
                         <Calendar
                             selectable
+                            popup
                             culture='en-US'
                             localizer={localizer}
                             defaultView={'month'}
@@ -469,7 +520,7 @@ class Main extends React.Component<MainProps, MainState> {
                     </div>
                 </div>
 
-                <Sidebar token={this.props.token} userid={this.props.userid} userSettings={this.state.userSettings} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} />
+                <Sidebar token={this.props.token} userid={this.props.userid} userSettings={this.state.userSettings} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} allWorkouts={this.state.allWorkouts} allPlans={this.state.allPlans}/>
             </div>
         );
     }

@@ -10,7 +10,8 @@ export interface ViewWorkoutModalProps {
     viewWorkoutModal: boolean,
     selectedWorkout: workoutEntry,
     updateSelectedWorkout: Function,
-    userSettings: userInfo
+    userSettings: userInfo,
+    updateEvents: Function
 }
  
 export interface ViewWorkoutModalState {
@@ -51,7 +52,6 @@ class ViewWorkoutModal extends React.Component<ViewWorkoutModalProps, ViewWorkou
 
     updateWorkout = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(`${APIURL}/workout/update/${this.props.selectedWorkout.id}`);
         fetch(`${APIURL}/workout/update/${this.props.selectedWorkout.id}`, {
             method: 'PUT',
             body: JSON.stringify({
@@ -71,13 +71,13 @@ class ViewWorkoutModal extends React.Component<ViewWorkoutModalProps, ViewWorkou
         })
         .then((response) => response.json())
         .then((data) => {
-            console.log(data)
+            // console.log(data)
+            this.props.updateEvents();
             this.props.viewWorkoutToggle()
         })
     }
 
     deleteWorkout = () => {
-        console.log(`${APIURL}/plan/${this.props.selectedWorkout.id}`);
         fetch(`${APIURL}/workout/${this.props.selectedWorkout.id}`, {
             method: 'DELETE',
             headers: new Headers({
@@ -87,7 +87,8 @@ class ViewWorkoutModal extends React.Component<ViewWorkoutModalProps, ViewWorkou
         })
         .then((response) => response.json())
         .then((data) => {
-            console.log(data)
+            // console.log(data)
+            this.props.updateEvents();
             this.props.viewWorkoutToggle()
         })
     }

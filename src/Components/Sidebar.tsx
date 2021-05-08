@@ -1,9 +1,11 @@
 import * as React from 'react';
 import { ProSidebar, SidebarHeader, Menu, MenuItem, SidebarContent } from 'react-pro-sidebar';
-import { FaRunning, FaCalendarAlt, FaCloudDownloadAlt } from "react-icons/fa";
+import { FaRunning, FaCalendarAlt, FaCloudDownloadAlt, FaUserCircle, FaChartLine, FaAward, FaEye } from "react-icons/fa";
 import './Sidebar.scss';
-import { userInfo, planEntry, workoutEntry } from './Main'
+import { userInfo, planEntry, workoutEntry, runnerInfo } from './Main'
 import { stringOrDate } from 'react-big-calendar';
+import APIURL from '../Helpers/environment';
+import ChangeView from './ChangeView';
 
 export interface SidebarProps {
     token: string,
@@ -14,7 +16,8 @@ export interface SidebarProps {
     createWorkoutModal: boolean,
     userSettings: userInfo,
     allWorkouts: Array<workoutEntry>
-    allPlans: Array<planEntry>
+    allPlans: Array<planEntry>,
+    runnerInfo: Array<runnerInfo>
 }
  
 export interface SidebarState {
@@ -27,7 +30,16 @@ export interface SidebarState {
     nextRaceName: stringOrDate,
     weeksUntilRace: number,
     daysUntilRace: number,
-    hoursUntilRace: number
+    hoursUntilRace: number,
+    runnerInfo: RunnerData,
+    changeViewModal: boolean,
+}
+
+export interface RunnerData {
+    firstname: string,
+    lastname: string,
+    runnerid: number
+
 }
  
 class Sidebar extends React.Component<SidebarProps, SidebarState> {
@@ -43,7 +55,13 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
             nextRaceName: '',
             weeksUntilRace: 0,
             daysUntilRace: 0,
-            hoursUntilRace: 0
+            hoursUntilRace: 0,
+            runnerInfo: {
+                firstname: '',
+                lastname: '',
+                runnerid: 0,
+            },
+            changeViewModal: false
         };
     }
 
@@ -120,6 +138,33 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
         })
     };
     
+    getRunnerForCoach= () => {
+        console.log(`${APIURL}/user/${this.props.userSettings.viewAsUser}`)
+        fetch(`${APIURL}/user/${this.props.userSettings.viewAsUser}`, {
+            method: 'GET',
+            headers: new Headers ({
+                'Content-Type': 'application/json',
+                'Authorization': this.props.token
+            })
+        })
+        .then((response) => response.json())
+        .then((runner) => {
+            this.setState({
+                runnerInfo: {
+                    firstname: runner.firstname,
+                    lastname: runner.lastname,
+                    runnerid: runner.id
+                }
+            })
+        })
+    }
+
+    changeViewToggle = () => {
+        this.setState(prevState => ({
+            changeViewModal: !prevState.changeViewModal
+        }));
+    }
+
     componentDidMount() {
         this.calculateGoalCountdown();
     }
@@ -131,13 +176,24 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
         if (prevProps.allPlans !== this.props.allPlans) {
             this.calculateGoalCountdown();
         }
+        if (prevProps.userSettings.viewAsUser !== this.props.userSettings.viewAsUser) {
+            this.getRunnerForCoach();
+        }
     }
 
     render() { 
 
         return (
             <div id="sidebar">
+                <ChangeView token={this.props.token} userSettings={this.props.userSettings} runnerInfo={this.props.runnerInfo} changeViewModal={this.state.changeViewModal} changeViewToggle={this.changeViewToggle} />
                 <ProSidebar>
+                    <SidebarHeader>
+                        <h4><FaUserCircle />{this.props.userSettings.firstname} {this.props.userSettings.lastname} </h4>
+                        <Menu iconShape="square">
+                            {(this.props.userSettings.coach === true && this.props.userSettings.viewAsUser !== this.props.userSettings.userid) ? <MenuItem icon={<FaEye />} onClick={() => this.changeViewToggle()} >Viewing: {this.state.runnerInfo.firstname} {this.state.runnerInfo.lastname}</MenuItem> : null}
+                            {(this.props.userSettings.coach === true && this.props.userSettings.viewAsUser === this.props.userSettings.userid) ? <MenuItem icon={<FaEye />} onClick={() => this.changeViewToggle()} >Viewing: You</MenuItem> : null}
+                        </Menu>
+                    </SidebarHeader>
                     <Menu iconShape="square">
                         <MenuItem icon={<FaCalendarAlt />} onClick={() => this.props.createPlanToggle()}>Create Plan Entry</MenuItem>
                         <MenuItem icon={<FaRunning />} onClick={() => this.props.createWorkoutToggle()}>Record Workout</MenuItem>
@@ -145,7 +201,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
                     </Menu>
                     <SidebarHeader>
                         <div className="monthlystatsheader">
-                            <h4>Monthly Stats</h4>
+                            <h4><FaChartLine />Monthly Stats</h4>
                         </div>
                     </SidebarHeader>
                     <SidebarContent>
@@ -157,7 +213,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
                     </SidebarContent>
                     <SidebarHeader>
                         <div className="goalheader">
-                            <h4>Race Countown</h4>
+                            <h4><FaAward />Race Countown</h4>
                         </div>
                     </SidebarHeader>
                     <SidebarContent>

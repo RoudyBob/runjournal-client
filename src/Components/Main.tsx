@@ -8,6 +8,7 @@ import ViewPlanModal from './ViewPlanModal';
 import ViewWorkoutModal from './ViewWorkoutModal';
 import ImportModal from './ImportModal';
 import ChoiceModal from './ChoiceModal';
+import ChangeView from './ChangeView';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import APIURL from '../Helpers/environment';
 
@@ -18,6 +19,7 @@ export interface MainProps {
  
 export interface MainState {
     userSettings: userInfo,
+    runnerInfo: Array<runnerInfo>,
     createPlanModal: boolean,
     viewPlanModal: boolean,
     selectedPlan: planEntry,
@@ -33,8 +35,19 @@ export interface MainState {
 }
 
 export interface userInfo {
+    userid: number,
+    viewAsUser: number,
+    firstname: string,
+    lastname: string,
     defaultUnits: string,
-    weekStart: string
+    weekStart: string,
+    coach: boolean,
+    runners?: Array<number>
+}
+
+export interface runnerInfo {
+    name: string,
+    id: number
 }
 
 export interface planEntry {
@@ -85,9 +98,16 @@ class Main extends React.Component<MainProps, MainState> {
         super(props);
         this.state = { 
             userSettings: {
+                userid: 0,
+                viewAsUser: 0,
+                firstname: '',
+                lastname: '',
                 defaultUnits: '',
-                weekStart: ''
+                weekStart: '',
+                coach: false,
+                runners: []
             },
+            runnerInfo: [],
             createPlanModal: false,
             viewPlanModal: false,
             selectedPlan: {
@@ -396,20 +416,44 @@ class Main extends React.Component<MainProps, MainState> {
         })
         .then((response) => response.json())
         .then((user) => {
-            // console.log(user);
+            console.log(user);
+            console.log(this.state.userSettings.viewAsUser)
+            console.log(this.state.userSettings.userid);
+            if (user.team.runners.length > 0) {
+                user.team.runners.forEach((runnerid : number) => {
+                    console.log(`${APIURL}/user/${runnerid}`)
+                    fetch(`${APIURL}/user/${runnerid}`, {
+                        method: 'GET',
+                        headers: new Headers ({
+                            'Content-Type': 'application/json',
+                            'Authorization': this.props.token
+                        })
+                    })
+                    .then((response) => response.json())
+                    .then((runner) => { 
+                        this.setState({ runnerInfo: [...this.state.runnerInfo, { name: runner.firstname + " " + runner.lastname, id: runner.id }]})
+                    })
+                })
+            }
             this.setState({
                 userSettings: {
+                    userid: user.id,
+                    viewAsUser: user.id,
+                    firstname: user.firstname,
+                    lastname: user.lastname,
                     defaultUnits: user.defaultunits,
-                    weekStart: user.weekstart
+                    weekStart: user.weekstart,
+                    coach: user.coach,
+                    runners: user.team.runners
                 }
             })
         })
     }
 
     componentDidMount() {
+        this.getUserSettings();
         this.fetchAllPlans();
         this.fetchAllWorkouts();
-        this.getUserSettings();
     }
 
     updateSelectedPlan = (updatedPlan: planEntry) => {
@@ -490,8 +534,8 @@ class Main extends React.Component<MainProps, MainState> {
                 <ViewPlanModal token={this.props.token} userSettings={this.state.userSettings} viewPlanToggle={this.viewPlanToggle} viewPlanModal={this.state.viewPlanModal} selectedPlan={this.state.selectedPlan} updateSelectedPlan={this.updateSelectedPlan} updateEvents={this.updateEvents} />
                 <ViewWorkoutModal token={this.props.token} userSettings={this.state.userSettings} viewWorkoutToggle={this.viewWorkoutToggle} viewWorkoutModal={this.state.viewWorkoutModal} selectedWorkout={this.state.selectedWorkout} updateSelectedWorkout={this.updateSelectedWorkout} updateEvents={this.updateEvents} />
                 <ImportModal token={this.props.token} importToggle={this.importToggle} importModal={this.state.importModal} />
-                <ChoiceModal choiceToggle={this.choiceToggle} createWorkoutToggle={this.createWorkoutToggle} createPlanToggle={this.createPlanToggle} choiceModal={this.state.choiceModal} />
-
+                <ChoiceModal choiceToggle={this.choiceToggle} createWorkoutToggle={this.createWorkoutToggle} createPlanToggle={this.createPlanToggle} choiceModal={this.state.choiceModal} />                
+                
                 <div className="main-inner">
                     <div className="calendar-wrapper">
                         <Calendar
@@ -520,7 +564,7 @@ class Main extends React.Component<MainProps, MainState> {
                     </div>
                 </div>
 
-                <Sidebar token={this.props.token} userid={this.props.userid} userSettings={this.state.userSettings} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} allWorkouts={this.state.allWorkouts} allPlans={this.state.allPlans}/>
+                <Sidebar token={this.props.token} userid={this.props.userid} userSettings={this.state.userSettings} runnerInfo={this.state.runnerInfo} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} allWorkouts={this.state.allWorkouts} allPlans={this.state.allPlans}/>
             </div>
         );
     }

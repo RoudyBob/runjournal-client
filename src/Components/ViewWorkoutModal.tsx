@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { stringOrDate } from 'react-big-calendar';
-import { Form, Label, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import { Alert, Form, Label, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import APIURL from '../Helpers/environment';
 import { userInfo, workoutEntry } from './Main';
 
@@ -11,7 +11,8 @@ export interface ViewWorkoutModalProps {
     selectedWorkout: workoutEntry,
     updateSelectedWorkout: Function,
     userSettings: userInfo,
-    updateEvents: Function
+    updateEvents: Function,
+    viewAsUser: number
 }
  
 export interface ViewWorkoutModalState {
@@ -27,7 +28,9 @@ export interface ViewWorkoutModalState {
     temp: number,
     humidity: number,
     aqi: number,
-    notes: string
+    notes: string,
+    modifyAlertVisible: boolean,
+    deleteAlertVisible: boolean
 }
  
 class ViewWorkoutModal extends React.Component<ViewWorkoutModalProps, ViewWorkoutModalState> {
@@ -46,51 +49,79 @@ class ViewWorkoutModal extends React.Component<ViewWorkoutModalProps, ViewWorkou
             temp: 0,
             humidity: 0,
             aqi: 0,
-            notes: ''
+            notes: '',
+            modifyAlertVisible: false,
+            deleteAlertVisible: false
         };
     }
 
     updateWorkout = (e: React.ChangeEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        fetch(`${APIURL}/workout/update/${this.props.selectedWorkout.id}`, {
-            method: 'PUT',
-            body: JSON.stringify({
-                workout: {
-                    timestamp: this.props.selectedWorkout.timestamp,
-                    description: this.props.selectedWorkout.description,
-                    elapsedtime: this.props.selectedWorkout.elapsedtime,
-                    distance: this.props.selectedWorkout.distance,
-                    units: this.props.selectedWorkout.units,
-                    notes: this.props.selectedWorkout.notes
-                }
-            }),
-            headers: new Headers({
-                'Content-Type': 'application/json',
-                'Authorization': this.props.token
+        if (this.state.deleteAlertVisible || this.state.modifyAlertVisible) {
+            e.preventDefault();
+            this.setState(prevState => ({
+                modifyAlertVisible: false,
+                deleteAlertVisible: false
+            }));
+            this.props.viewWorkoutToggle();
+        } else {
+            e.preventDefault();
+            fetch(`${APIURL}/workout/update/${this.props.selectedWorkout.id}`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    workout: {
+                        timestamp: this.props.selectedWorkout.timestamp,
+                        description: this.props.selectedWorkout.description,
+                        elapsedtime: this.props.selectedWorkout.elapsedtime,
+                        distance: this.props.selectedWorkout.distance,
+                        units: this.props.selectedWorkout.units,
+                        notes: this.props.selectedWorkout.notes,
+                        userId: this.props.selectedWorkout.id
+                    }
+                }),
+                headers: new Headers({
+                    'Content-Type': 'application/json',
+                    'Authorization': this.props.token
+                })
             })
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            // console.log(data)
-            this.props.updateEvents();
-            this.props.viewWorkoutToggle()
-        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.hasOwnProperty("error")) {
+                    this.setState({ modifyAlertVisible: true })
+                } else {
+                    // console.log(data)
+                    this.props.updateEvents();
+                    this.props.viewWorkoutToggle()
+                }
+            })
+        }
     }
 
     deleteWorkout = () => {
-        fetch(`${APIURL}/workout/${this.props.selectedWorkout.id}`, {
-            method: 'DELETE',
-            headers: new Headers({
-                'Content-Type': 'application/json',
-                'Authorization': this.props.token
+        if (this.state.deleteAlertVisible || this.state.modifyAlertVisible) {
+            this.setState(prevState => ({
+                modifyAlertVisible: false,
+                deleteAlertVisible: false
+            }));
+            this.props.viewWorkoutToggle();
+        } else {
+            fetch(`${APIURL}/workout/${this.props.selectedWorkout.id}`, {
+                method: 'DELETE',
+                headers: new Headers({
+                    'Content-Type': 'application/json',
+                    'Authorization': this.props.token
+                })
             })
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            // console.log(data)
-            this.props.updateEvents();
-            this.props.viewWorkoutToggle()
-        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.hasOwnProperty("error")) {
+                    this.setState({ deleteAlertVisible: true })
+                } else {
+                    // console.log(data)
+                    this.props.updateEvents();
+                    this.props.viewWorkoutToggle()
+                }
+            })
+        }
     }
 
     updateTimestamp = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -182,6 +213,10 @@ class ViewWorkoutModal extends React.Component<ViewWorkoutModalProps, ViewWorkou
 
     exitModal = () => {
         this.setState({ units: this.props.userSettings.defaultUnits });
+        this.setState(prevState => ({
+            modifyAlertVisible: false,
+            deleteAlertVisible: false
+        }));
         this.props.viewWorkoutToggle();
     }
 
@@ -191,6 +226,16 @@ class ViewWorkoutModal extends React.Component<ViewWorkoutModalProps, ViewWorkou
                 <Modal isOpen={this.props.viewWorkoutModal} toggle={() => this.exitModal()} className="viewworkoutmodal">
                 <ModalHeader toggle={() => this.exitModal()}>View or Modify a Workout Entry</ModalHeader>
                 <ModalBody>
+                    <div className="operationfailed">
+                            <Alert color="danger" isOpen={this.state.deleteAlertVisible} toggle={this.exitModal}>
+                                Coaches can't delete users' workouts.
+                            </Alert>
+                    </div>
+                    <div className="operationfailed">
+                            <Alert color="danger" isOpen={this.state.modifyAlertVisible} toggle={this.exitModal}>
+                                Coaches can't modify users' workouts.
+                            </Alert>
+                    </div>
                     <Form onSubmit={this.updateWorkout}>
                         <div className="form-group">
                             <Label>Timestamp</Label>

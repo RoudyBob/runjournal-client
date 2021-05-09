@@ -35,6 +35,8 @@ class Signup extends React.Component<SignupProps, SignupState> {
 
     handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
+        console.log(`${APIURL}/user/signup`)
+        console.log(this.state.email);
         fetch(`${APIURL}/user/signup`, {
             method: 'POST',
             body: JSON.stringify({
@@ -55,8 +57,8 @@ class Signup extends React.Component<SignupProps, SignupState> {
         })
         .then((response) => response.json())
         .then((data) => {
-            // console.log(data);
-            this.props.updateToken(data.sessionToken, data.user.id);
+            console.log(data.sessionToken);
+            this.props.updateToken(data.sessionToken);
             this.props.history.push('/main');
         })
     }
@@ -87,11 +89,6 @@ class Signup extends React.Component<SignupProps, SignupState> {
                         <div className="form-group">
                             <label>Password</label>
                             <input type="password" className="form-control" placeholder="Enter password" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ password: e.currentTarget.value })} required />
-                        </div>
-
-                        <div className="form-group">
-                            <label>Birthdate</label>
-                            <input type="date" className="form-control" placeholder="01/01/1900" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ birthdate: e.currentTarget.value })} required />
                         </div>
 
                         <div className="form-group">

@@ -8,18 +8,22 @@ export interface ChangeViewProps {
     changeViewModal: boolean,
     changeViewToggle: Function,
     userSettings: userInfo,
-    runnerInfo: Array<runnerInfo>
+    runnerInfo: Array<runnerInfo>,
+    viewAsUser: number,
+    updateViewAsUser: Function
 }
  
 export interface ChangeViewState {
-    selectedRunner : number
+    selectedRunner: number,
+    showRunners: boolean
 }
  
 class ChangeView extends React.Component<ChangeViewProps, ChangeViewState> {
     constructor(props: ChangeViewProps) {
         super(props);
         this.state = {
-            selectedRunner : this.props.userSettings.viewAsUser
+            selectedRunner : this.props.viewAsUser,
+            showRunners: false
         };
     }
 
@@ -35,7 +39,7 @@ class ChangeView extends React.Component<ChangeViewProps, ChangeViewState> {
 
     handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(this.state.selectedRunner);
+        this.props.updateViewAsUser(this.state.selectedRunner);
         this.props.changeViewToggle();
     }
 
@@ -53,12 +57,12 @@ class ChangeView extends React.Component<ChangeViewProps, ChangeViewState> {
         return (
             <div>
                 <Modal isOpen={this.props.changeViewModal} toggle={() => this.props.changeViewToggle} className="changeviewmodal">
-                    <ModalHeader toggle={() => this.props.changeViewToggle()}>View As Runner</ModalHeader>
+                   <ModalHeader toggle={() => this.props.changeViewToggle()}>View As Runner</ModalHeader>
                     <ModalBody>
                         <Form onSubmit={this.handleSubmit}>
                         <FormGroup tag="fieldset" row>
                             <Col sm={12}>
-                            {(this.props.userSettings.runners) ? this.props.userSettings.runners.map((runner, index) => this.displayRunners(runner, index)) : <div></div> }
+                            {(this.props.runnerInfo) ? this.props.runnerInfo.map((runner, index) => this.displayRunners(runner.id, index)) : <div></div> }
                             </Col>
                         </FormGroup>
                             <Button color="primary">Save Plan Entry</Button>

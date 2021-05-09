@@ -11,7 +11,8 @@ export interface CreatePlanModalProps {
     selectedSlotInfo: slotInfo,
     updateSelectedSlot: Function
     userSettings: userInfo,
-    updateEvents: Function
+    updateEvents: Function,
+    viewAsUser: number
 }
  
 export interface CreatePlanModalState {
@@ -39,6 +40,7 @@ class CreatePlanModal extends React.Component<CreatePlanModalProps, CreatePlanMo
 
     createPlan = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
+        console.log(this.props.viewAsUser);
         fetch(`${APIURL}/plan`, {
             method: 'POST',
             body: JSON.stringify({
@@ -48,7 +50,8 @@ class CreatePlanModal extends React.Component<CreatePlanModalProps, CreatePlanMo
                     type: this.state.type, 
                     distance: this.state.distance,
                     units: this.state.units,
-                    notes: this.state.notes
+                    notes: this.state.notes,
+                    userId: this.props.viewAsUser
                 }
             }),
             headers: new Headers({

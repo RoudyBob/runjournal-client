@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Form, Label, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import { Alert, Form, Label, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import APIURL from '../Helpers/environment';
 import { slotInfo, userInfo } from './Main';
 
@@ -10,7 +10,8 @@ export interface CreateWorkoutModalProps {
     selectedSlotInfo: slotInfo,
     updateSelectedSlot: Function,
     userSettings: userInfo,
-    updateEvents: Function
+    updateEvents: Function,
+    viewAsUser: number
 }
  
 export interface CreateWorkoutModalState {
@@ -26,7 +27,8 @@ export interface CreateWorkoutModalState {
     temp: number,
     humidity: number,
     aqi: number,
-    notes: string
+    notes: string,
+    alertVisible: boolean
 }
  
 class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, CreateWorkoutModalState> {
@@ -45,7 +47,8 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
             temp: 0,
             humidity: 0,
             aqi: 0,
-            notes: ''
+            notes: '',
+            alertVisible: false
         };
     }
 
@@ -53,6 +56,7 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
         e.preventDefault();
         var tmpDate = new Date(this.props.selectedSlotInfo.start);
         tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
+        console.log(this.props.viewAsUser);
         fetch(`${APIURL}/workout`, {
             method: 'POST',
             body: JSON.stringify({
@@ -69,7 +73,8 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
                     temp: this.state.temp,
                     humidity: this.state.humidity,
                     aqi: this.state.aqi,
-                    notes: this.state.notes
+                    notes: this.state.notes,
+                    userId: this.props.viewAsUser
                 }
             }),
             headers: new Headers({
@@ -79,9 +84,13 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
         })
         .then((response) => response.json())
         .then((workout) => {
-            // console.log(workout)
-            this.props.updateEvents();
-            this.exitModal();
+            if (workout.hasOwnProperty("error")) {
+                this.setState({ alertVisible: true })
+            } else {
+                // console.log(workout)
+                this.props.updateEvents();
+                this.exitModal();
+            }
         })
     };
 
@@ -94,6 +103,9 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
 
     exitModal = () => {
         this.setState({ units: this.props.userSettings.defaultUnits });
+        this.setState(prevState => ({
+            alertVisible: !prevState.alertVisible
+        }));
         this.props.createWorkoutToggle();
     }
 
@@ -103,7 +115,12 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
                 <Modal isOpen={this.props.createWorkoutModal} toggle={() => this.exitModal()} className="createworkoutmodal">
                 <ModalHeader toggle={() => this.exitModal()}>Create Workout Entry</ModalHeader>
                 <ModalBody>
-                <Form onSubmit={this.createWorkout}>
+                    <div className="operationfailed">
+                            <Alert color="danger" isOpen={this.state.alertVisible} toggle={this.exitModal}>
+                                Unable to create workouts on behalf of runners.
+                            </Alert>
+                    </div>
+                    <Form onSubmit={this.createWorkout}>
                         <div className="form-group">
                             <Label>Timestamp</Label>
                             <input type="datetime-local" className="form-control" value={this.props.selectedSlotInfo.start.toString().split(":")[0] + ":" + this.props.selectedSlotInfo.start.toString().toString().split(":")[1]} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.props.updateSelectedSlot(e.currentTarget.value)} required />

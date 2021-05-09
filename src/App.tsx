@@ -15,7 +15,7 @@ export interface AppProps {
  
 export interface AppState {
     sessionToken: string | null,
-    userid: string | null,
+    userid: string,
     newToken: string,
     showLogin: boolean
 }
@@ -39,11 +39,9 @@ class App extends React.Component<AppProps, AppState> {
     return (this.state.sessionToken ? <Main token={this.state.sessionToken} userid={this.state.userid} /> : <Redirect to="/" />);
   };
 
-  updateToken = (newToken: string, newUserid: string, newUnits: string) => {
+  updateToken = (newToken: string) => {
     localStorage.setItem('token', newToken);
     this.setState({ sessionToken: newToken});
-    localStorage.setItem('userid', newUserid);
-    this.setState({ userid: newUserid });
   }
 
   clearToken = () => {
@@ -56,7 +54,10 @@ class App extends React.Component<AppProps, AppState> {
       this.setState({ sessionToken: localStorage.getItem('token') });
     }
     if (localStorage.getItem('userid')) {
-      this.setState({ userid: localStorage.getItem('userid') });
+      let tmpUserid : string | null = localStorage.getItem('userid')
+      if (tmpUserid) {
+        this.setState({ userid: tmpUserid })
+      }
     }
   }
 

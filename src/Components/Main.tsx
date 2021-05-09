@@ -8,16 +8,16 @@ import ViewPlanModal from './ViewPlanModal';
 import ViewWorkoutModal from './ViewWorkoutModal';
 import ImportModal from './ImportModal';
 import ChoiceModal from './ChoiceModal';
-import ChangeView from './ChangeView';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import APIURL from '../Helpers/environment';
 
 export interface MainProps {
     token: string,
-    userid: string | null,
+    userid: string,
 }
  
 export interface MainState {
+    viewAsUser: number,
     userSettings: userInfo,
     runnerInfo: Array<runnerInfo>,
     createPlanModal: boolean,
@@ -36,9 +36,9 @@ export interface MainState {
 
 export interface userInfo {
     userid: number,
-    viewAsUser: number,
     firstname: string,
     lastname: string,
+    email: string,
     defaultUnits: string,
     weekStart: string,
     coach: boolean,
@@ -97,11 +97,12 @@ class Main extends React.Component<MainProps, MainState> {
     constructor(props: MainProps) {
         super(props);
         this.state = { 
+            viewAsUser: 0,
             userSettings: {
                 userid: 0,
-                viewAsUser: 0,
                 firstname: '',
                 lastname: '',
+                email: '',
                 defaultUnits: '',
                 weekStart: '',
                 coach: false,
@@ -340,7 +341,7 @@ class Main extends React.Component<MainProps, MainState> {
     }
 
     fetchAllPlans = () => {
-        fetch(`${APIURL}/plan/${this.props.userid}`, {
+        fetch(`${APIURL}/plan/${this.state.viewAsUser}`, {
             method: 'GET',
             headers: new Headers ({
                 'Content-Type': 'application/json',
@@ -371,7 +372,7 @@ class Main extends React.Component<MainProps, MainState> {
     };
 
     fetchAllWorkouts = () => {
-        fetch(`${APIURL}/workout/${this.props.userid}`, {
+        fetch(`${APIURL}/workout/${this.state.viewAsUser}`, {
             method: 'GET',
             headers: new Headers ({
                 'Content-Type': 'application/json',
@@ -417,43 +418,60 @@ class Main extends React.Component<MainProps, MainState> {
         .then((response) => response.json())
         .then((user) => {
             console.log(user);
-            console.log(this.state.userSettings.viewAsUser)
-            console.log(this.state.userSettings.userid);
-            if (user.team.runners.length > 0) {
-                user.team.runners.forEach((runnerid : number) => {
-                    console.log(`${APIURL}/user/${runnerid}`)
-                    fetch(`${APIURL}/user/${runnerid}`, {
-                        method: 'GET',
-                        headers: new Headers ({
-                            'Content-Type': 'application/json',
-                            'Authorization': this.props.token
+            if (user.coach) {
+                if (user.team.runners) {
+                    // Before you begin, add current user to runnerInfo array so they can select themselves to view
+                    this.setState({ runnerInfo: [...this.state.runnerInfo, { name: user.firstname + " " + user.lastname, id: parseInt(this.props.userid) }]})
+                    user.team.runners.forEach((runnerid : number) => {
+                        console.log(`${APIURL}/user/${runnerid}`)
+                        fetch(`${APIURL}/user/${runnerid}`, {
+                            method: 'GET',
+                            headers: new Headers ({
+                                'Content-Type': 'application/json',
+                                'Authorization': this.props.token
+                            })
+                        })
+                        .then((response) => response.json())
+                        .then((runner) => { 
+                            this.setState({ runnerInfo: [...this.state.runnerInfo, { name: runner.firstname + " " + runner.lastname, id: runner.id }]})
                         })
                     })
-                    .then((response) => response.json())
-                    .then((runner) => { 
-                        this.setState({ runnerInfo: [...this.state.runnerInfo, { name: runner.firstname + " " + runner.lastname, id: runner.id }]})
+                    this.setState({
+                        userSettings: {
+                            userid: user.id,
+                            firstname: user.firstname,
+                            lastname: user.lastname,
+                            email: user.email,
+                            defaultUnits: user.defaultunits,
+                            weekStart: user.weekstart,
+                            coach: user.coach,
+                            runners: user.team.runners
+                        }
                     })
+                }
+            } else {
+                this.setState({
+                    userSettings: {
+                        userid: user.id,
+                        firstname: user.firstname,
+                        lastname: user.lastname,
+                        email: user.email,
+                        defaultUnits: user.defaultunits,
+                        weekStart: user.weekstart,
+                        coach: user.coach,
+                    }
                 })
             }
-            this.setState({
-                userSettings: {
-                    userid: user.id,
-                    viewAsUser: user.id,
-                    firstname: user.firstname,
-                    lastname: user.lastname,
-                    defaultUnits: user.defaultunits,
-                    weekStart: user.weekstart,
-                    coach: user.coach,
-                    runners: user.team.runners
-                }
-            })
         })
     }
 
+    updateViewAsUser = (id: number) => {
+        this.setState({ viewAsUser: id }, this.updateEvents)
+    }
+
     componentDidMount() {
+        this.setState({ viewAsUser : parseInt(this.props.userid) }, this.updateEvents);
         this.getUserSettings();
-        this.fetchAllPlans();
-        this.fetchAllWorkouts();
     }
 
     updateSelectedPlan = (updatedPlan: planEntry) => {
@@ -514,6 +532,20 @@ class Main extends React.Component<MainProps, MainState> {
         })
     }
 
+    updateUserSettings = (newSettings: userInfo) => {
+        this.setState({
+            userSettings: {
+                userid: newSettings.userid,
+                firstname: newSettings.firstname,
+                lastname: newSettings.lastname,
+                email: newSettings.email,
+                defaultUnits: newSettings.defaultUnits,
+                weekStart: newSettings.weekStart,
+                coach: newSettings.coach,
+            }
+        })
+    }
+
     updateEvents = () => {
         this.setState({events: []});
         this.fetchAllPlans();
@@ -529,10 +561,10 @@ class Main extends React.Component<MainProps, MainState> {
 
         return (
             <div className="main-wrapper">
-                <CreatePlanModal token={this.props.token} userSettings={this.state.userSettings} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} updateSelectedSlot={this.updateSelectedPlanSlotInfo} selectedSlotInfo={this.state.selectedSlotInfo} updateEvents={this.updateEvents}/>
-                <CreateWorkoutModal token={this.props.token} userSettings={this.state.userSettings} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} updateSelectedSlot={this.updateSelectedWorkoutSlotInfo} selectedSlotInfo={this.state.selectedSlotInfo} updateEvents={this.updateEvents}/>
-                <ViewPlanModal token={this.props.token} userSettings={this.state.userSettings} viewPlanToggle={this.viewPlanToggle} viewPlanModal={this.state.viewPlanModal} selectedPlan={this.state.selectedPlan} updateSelectedPlan={this.updateSelectedPlan} updateEvents={this.updateEvents} />
-                <ViewWorkoutModal token={this.props.token} userSettings={this.state.userSettings} viewWorkoutToggle={this.viewWorkoutToggle} viewWorkoutModal={this.state.viewWorkoutModal} selectedWorkout={this.state.selectedWorkout} updateSelectedWorkout={this.updateSelectedWorkout} updateEvents={this.updateEvents} />
+                <CreatePlanModal token={this.props.token} viewAsUser={this.state.viewAsUser} userSettings={this.state.userSettings} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} updateSelectedSlot={this.updateSelectedPlanSlotInfo} selectedSlotInfo={this.state.selectedSlotInfo} updateEvents={this.updateEvents}/>
+                <CreateWorkoutModal token={this.props.token} viewAsUser={this.state.viewAsUser} userSettings={this.state.userSettings} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} updateSelectedSlot={this.updateSelectedWorkoutSlotInfo} selectedSlotInfo={this.state.selectedSlotInfo} updateEvents={this.updateEvents}/>
+                <ViewPlanModal token={this.props.token} viewAsUser={this.state.viewAsUser} userSettings={this.state.userSettings} viewPlanToggle={this.viewPlanToggle} viewPlanModal={this.state.viewPlanModal} selectedPlan={this.state.selectedPlan} updateSelectedPlan={this.updateSelectedPlan} updateEvents={this.updateEvents} />
+                <ViewWorkoutModal token={this.props.token} viewAsUser={this.state.viewAsUser} userSettings={this.state.userSettings} viewWorkoutToggle={this.viewWorkoutToggle} viewWorkoutModal={this.state.viewWorkoutModal} selectedWorkout={this.state.selectedWorkout} updateSelectedWorkout={this.updateSelectedWorkout} updateEvents={this.updateEvents} />
                 <ImportModal token={this.props.token} importToggle={this.importToggle} importModal={this.state.importModal} />
                 <ChoiceModal choiceToggle={this.choiceToggle} createWorkoutToggle={this.createWorkoutToggle} createPlanToggle={this.createPlanToggle} choiceModal={this.state.choiceModal} />                
                 
@@ -564,7 +596,7 @@ class Main extends React.Component<MainProps, MainState> {
                     </div>
                 </div>
 
-                <Sidebar token={this.props.token} userid={this.props.userid} userSettings={this.state.userSettings} runnerInfo={this.state.runnerInfo} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} allWorkouts={this.state.allWorkouts} allPlans={this.state.allPlans}/>
+                <Sidebar token={this.props.token} userid={this.props.userid} updateUserSettings={this.updateUserSettings} userSettings={this.state.userSettings} runnerInfo={this.state.runnerInfo} viewAsUser={this.state.viewAsUser} updateViewAsUser={this.updateViewAsUser} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} allWorkouts={this.state.allWorkouts} allPlans={this.state.allPlans}/>
             </div>
         );
     }

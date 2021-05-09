@@ -10,7 +10,8 @@ export interface ViewPlanModalProps {
     selectedPlan: planEntry,
     updateSelectedPlan: Function,
     userSettings: userInfo,
-    updateEvents: Function
+    updateEvents: Function,
+    viewAsUser: number
 }
  
 export interface ViewPlanModalState {

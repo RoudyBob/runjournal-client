@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FormGroup, Form, Col, Label, Input, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import { Button, FormGroup, Form, Col, Label, Input, Modal, ModalFooter, ModalHeader, ModalBody } from 'reactstrap';
 import APIURL from '../Helpers/environment';
 import { userInfo } from './Main';
 
@@ -332,61 +332,67 @@ class EditProfile extends React.Component<EditProfileProps, EditProfileState> {
 
     render() { 
         return (
-            <Modal isOpen={this.props.editProfileModal} toggle={() => this.exitModal()} className="editprofilemodal">
-                <ModalHeader toggle={() => this.exitModal()}>Edit Profile</ModalHeader>
-                <ModalBody>
-                    <Form onSubmit={this.updateSettings}>
-                        <div className="form-group">
-                            <Label>First name</Label>
-                            <input type="text" className="form-control" value={this.props.userSettings.firstname} placeholder="First name" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.updateFirstname(e)}/>
-                        </div>
-
-                        <div className="form-group">
-                            <label>Last name</label>
-                            <input type="text" className="form-control" value={this.props.userSettings.lastname} placeholder="Last name" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.updateLastname(e)} />
-                        </div>
-
-                        <div className="form-group">
-                            <label>Email address</label>
-                            <input type="email" className="form-control" value={this.props.userSettings.email} placeholder="Enter email" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.updateEmail(e)} />
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="weekstart">Start of week</label>
-                            <select className="form-control" id="weekstart" value={this.props.userSettings.weekStart} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => this.updateWeekStart(e)} >
-                                <option value="monday">Monday</option>
-                                <option value="sunday">Sunday</option>
-                            </select>
-                        </div>
-
-                        <div className="form-group">
-                            <label htmlFor="defaultunit">Default unit</label>
-                            <select className="form-control" id="defaultunit" value={this.props.userSettings.defaultUnits} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => this.updateDefaultUnits(e)}>
-                                <option value="mi">mi</option>
-                                <option value="km">km</option>
-                            </select>
-                        </div>
-
-                        <div className="form-group">
-                            <div className="custom-control custom-checkbox">
-                                <input type="checkbox" className="custom-control-input" id="coachcheck" checked={(this.props.userSettings.coach) ? true : false} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.updateCoach(e)} />
-                                <label className="custom-control-label" htmlFor="coachcheck">Register as coach?</label>
+            <div className="editprofile-div">
+                <Modal isOpen={this.props.editProfileModal} toggle={() => this.exitModal()} className="editprofilemodal">
+                    <ModalHeader toggle={() => this.exitModal()}>Edit Profile</ModalHeader>
+                    <ModalBody>
+                        <Form onSubmit={this.updateSettings}>
+                            <div className="form-group">
+                                <Label>First name</Label>
+                                <input type="text" className="form-control" value={this.props.userSettings.firstname} placeholder="First name" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.updateFirstname(e)}/>
                             </div>
-                        </div>
 
-                        <div className="form-group">
-                            <Label htmlFor="defaultunit">Approved Coaches</Label>
-                            <FormGroup className="coacheslist">
-                                <Col sm={{ size: 20 }}>
-                                {(this.state.coaches) ? this.state.coaches.map((coach, index) => this.displayCoaches(coach, index)) : <div></div> }
-                                </Col>
-                            </FormGroup>
-                        </div>
+                            <div className="form-group">
+                                <label>Last name</label>
+                                <input type="text" className="form-control" value={this.props.userSettings.lastname} placeholder="Last name" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.updateLastname(e)} />
+                            </div>
 
-                        <button type="submit" className="btn btn-primary btn-block">Save Changes</button>
-                    </Form>
-                </ModalBody>
-            </Modal>
+                            <div className="form-group">
+                                <label>Email address</label>
+                                <input type="email" className="form-control" value={this.props.userSettings.email} placeholder="Enter email" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.updateEmail(e)} />
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="weekstart">Start of week</label>
+                                <select className="form-control" id="weekstart" value={this.props.userSettings.weekStart} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => this.updateWeekStart(e)} >
+                                    <option value="monday">Monday</option>
+                                    <option value="sunday">Sunday</option>
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="defaultunit">Default unit</label>
+                                <select className="form-control" id="defaultunit" value={this.props.userSettings.defaultUnits} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => this.updateDefaultUnits(e)}>
+                                    <option value="mi">mi</option>
+                                    <option value="km">km</option>
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <div className="custom-control custom-checkbox">
+                                    <input type="checkbox" className="custom-control-input" id="coachcheck" checked={(this.props.userSettings.coach) ? true : false} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.updateCoach(e)} />
+                                    <label className="custom-control-label" htmlFor="coachcheck">Register as coach?</label>
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <Label htmlFor="defaultunit">Approved Coaches</Label>
+                                <FormGroup className="coacheslist">
+                                    <Col sm={{ size: 20 }}>
+                                    {(this.state.coaches) ? this.state.coaches.map((coach, index) => this.displayCoaches(coach, index)) : <div></div> }
+                                    </Col>
+                                </FormGroup>
+                            </div>
+                            <ModalFooter>
+                                <Button color="primary" type="submit">Save Profile Changes</Button>
+                                <Button color="secondary" onClick={() => this.exitModal()}>Cancel</Button>
+                            </ModalFooter>
+                        </Form>
+                    </ModalBody>
+
+                </Modal>
+
+            </div>
         );
     }
 }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { stringOrDate } from 'react-big-calendar';
-import { Alert, Form, Label, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import { Alert, Form, Label, Button, Modal, ModalFooter, ModalHeader, ModalBody } from 'reactstrap';
 import APIURL from '../Helpers/environment';
 import { userInfo, workoutEntry } from './Main';
 
@@ -75,7 +75,7 @@ class ViewWorkoutModal extends React.Component<ViewWorkoutModalProps, ViewWorkou
                         distance: this.props.selectedWorkout.distance,
                         units: this.props.selectedWorkout.units,
                         notes: this.props.selectedWorkout.notes,
-                        userId: this.props.selectedWorkout.id
+                        userId: this.props.selectedWorkout.userId
                     }
                 }),
                 headers: new Headers({
@@ -213,26 +213,36 @@ class ViewWorkoutModal extends React.Component<ViewWorkoutModalProps, ViewWorkou
 
     exitModal = () => {
         this.setState({ units: this.props.userSettings.defaultUnits });
+        if (this.state.deleteAlertVisible || this.state.modifyAlertVisible) {
+            this.setState(prevState => ({
+                modifyAlertVisible: false,
+                deleteAlertVisible: false
+            }));
+        }
+        this.props.viewWorkoutToggle();
+    }
+
+    toggleAlert = () => {
         this.setState(prevState => ({
             modifyAlertVisible: false,
             deleteAlertVisible: false
         }));
-        this.props.viewWorkoutToggle();
+        this.exitModal();
     }
 
     render() { 
         return (
-            <div>
+            <div className="viewworkoutmodal-div">
                 <Modal isOpen={this.props.viewWorkoutModal} toggle={() => this.exitModal()} className="viewworkoutmodal">
                 <ModalHeader toggle={() => this.exitModal()}>View or Modify a Workout Entry</ModalHeader>
                 <ModalBody>
                     <div className="operationfailed">
-                            <Alert color="danger" isOpen={this.state.deleteAlertVisible} toggle={this.exitModal}>
+                            <Alert color="danger" isOpen={this.state.deleteAlertVisible} toggle={this.toggleAlert}>
                                 Coaches can't delete users' workouts.
                             </Alert>
                     </div>
                     <div className="operationfailed">
-                            <Alert color="danger" isOpen={this.state.modifyAlertVisible} toggle={this.exitModal}>
+                            <Alert color="danger" isOpen={this.state.modifyAlertVisible} toggle={this.toggleAlert}>
                                 Coaches can't modify users' workouts.
                             </Alert>
                     </div>
@@ -270,11 +280,11 @@ class ViewWorkoutModal extends React.Component<ViewWorkoutModalProps, ViewWorkou
                             <input type="text" className="form-control" value={this.props.selectedWorkout.notes} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.updateNotes(e)} />
                         </div>
 
-                        <div className="input-button-row">
-                        <Button color="primary">Save Changes</Button>
+                        <ModalFooter>
+                            <Button color="primary">Save Changes</Button>
                             <Button color="danger" onClick={() => this.deleteWorkout()}>Delete Entry</Button>
                             <Button color="secondary" onClick={() => this.exitModal()}>Cancel</Button>
-                        </div>
+                        </ModalFooter>
                     </Form>
                 </ModalBody>
                 </Modal>

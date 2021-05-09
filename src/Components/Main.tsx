@@ -80,7 +80,8 @@ export interface workoutEntry {
     temp: number,
     humidity: number,
     aqi: number,
-    notes: string
+    notes: string,
+    userId: number
 }
 
 export interface calendarEvent {
@@ -137,7 +138,8 @@ class Main extends React.Component<MainProps, MainState> {
                 temp: 0,
                 humidity: 0,
                 aqi: 0,
-                notes: ''
+                notes: '',
+                userId: 0
             },
             importModal: false,
             choiceModal: false,
@@ -172,7 +174,8 @@ class Main extends React.Component<MainProps, MainState> {
                 temp: 0,
                 humidity: 0,
                 aqi: 0,
-                notes: ''
+                notes: '',
+                userId: 0
             }],
             selectedSlotInfo: {
                 start: '',
@@ -309,7 +312,8 @@ class Main extends React.Component<MainProps, MainState> {
                     temp: workout.temp,
                     humidity: workout.humidity,
                     aqi: workout.aqi,
-                    notes: workout.notes
+                    notes: workout.notes,
+                    userId: workout.userId
                 }
             });
         });
@@ -505,7 +509,8 @@ class Main extends React.Component<MainProps, MainState> {
                 endlocation: this.state.selectedWorkout.endlocation,
                 temp: this.state.selectedWorkout.temp,
                 humidity: this.state.selectedWorkout.humidity,
-                aqi: this.state.selectedWorkout.aqi
+                aqi: this.state.selectedWorkout.aqi,
+                userId: this.state.selectedWorkout.userId
             }
         })
     }

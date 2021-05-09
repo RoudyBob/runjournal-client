@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { stringOrDate } from 'react-big-calendar';
-import { Form, Label, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import { Form, Label, ModalFooter, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import APIURL from '../Helpers/environment';
 import { slotInfo, userInfo } from './Main';
 
@@ -81,7 +81,7 @@ class CreatePlanModal extends React.Component<CreatePlanModalProps, CreatePlanMo
 
     render() { 
         return (
-            <div>
+            <div className="createplanmodal-div">
                 <Modal isOpen={this.props.createPlanModal} toggle={() => this.exitModal()} className="createplanmodal">
                 <ModalHeader toggle={() => this.exitModal()}>Create Plan Entry</ModalHeader>
                 <ModalBody>
@@ -121,8 +121,10 @@ class CreatePlanModal extends React.Component<CreatePlanModalProps, CreatePlanMo
                             <label>Notes</label>
                             <input type="text" className="form-control" placeholder="Notes" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ notes: e.currentTarget.value })} />
                         </div>
-                        <Button color="primary">Save Plan Entry</Button>
-                        <Button color="secondary" onClick={() => this.exitModal()}>Cancel</Button>
+                        <ModalFooter>
+                            <Button color="primary">Save Plan Entry</Button>
+                            <Button color="secondary" onClick={() => this.exitModal()}>Cancel</Button>
+                        </ModalFooter>
                     </Form>
                 </ModalBody>
                 </Modal>

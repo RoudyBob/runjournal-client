@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Button, Modal, ModalHeader, ModalFooter } from 'reactstrap';
 
 export interface ChoiceModalProps {
     choiceToggle: Function,
@@ -19,14 +19,12 @@ class ChoiceModal extends React.Component<ChoiceModalProps, ChoiceModalState> {
     }
     render() { 
         return (
-            <div>
+            <div className="choicemodal-div">
                 <Modal isOpen={this.props.choiceModal} toggle={() => this.props.choiceToggle} className="choicemodal">
                     <ModalHeader toggle={() => this.props.choiceToggle()}>Plan Entry or Workout?</ModalHeader>
-                    <ModalBody>
+                    <ModalFooter>
                         <Button color="primary" onClick={() => this.props.createPlanToggle()}>Create Plan Entry</Button>
                         <Button color="warning" onClick={() => this.props.createWorkoutToggle()}>Record Workout</Button>
-                    </ModalBody>
-                    <ModalFooter>
                         <Button color="secondary" onClick={() => this.props.choiceToggle()}>Cancel</Button>
                     </ModalFooter>
                 </Modal>

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Alert, Form, Label, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import { Alert, Form, Label, Button, Modal, ModalFooter, ModalHeader, ModalBody } from 'reactstrap';
 import APIURL from '../Helpers/environment';
 import { slotInfo, userInfo } from './Main';
 
@@ -101,22 +101,26 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
 
     }
 
-    exitModal = () => {
-        this.setState({ units: this.props.userSettings.defaultUnits });
+    toggleAlert = () => {
         this.setState(prevState => ({
             alertVisible: !prevState.alertVisible
         }));
+        this.exitModal();
+    }
+
+    exitModal = () => {
+        this.setState({ units: this.props.userSettings.defaultUnits });
         this.props.createWorkoutToggle();
     }
 
     render() { 
         return (
-            <div>
+            <div className="createworkoutmodal-div">
                 <Modal isOpen={this.props.createWorkoutModal} toggle={() => this.exitModal()} className="createworkoutmodal">
                 <ModalHeader toggle={() => this.exitModal()}>Create Workout Entry</ModalHeader>
                 <ModalBody>
                     <div className="operationfailed">
-                            <Alert color="danger" isOpen={this.state.alertVisible} toggle={this.exitModal}>
+                            <Alert color="danger" isOpen={this.state.alertVisible} toggle={this.toggleAlert}>
                                 Unable to create workouts on behalf of runners.
                             </Alert>
                     </div>
@@ -153,10 +157,13 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
                             <label>Notes</label>
                             <input type="text" className="form-control" placeholder="Notes" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ notes: e.currentTarget.value })} />
                         </div>
-                        <Button color="primary">Save Plan Entry</Button>
-                        <Button color="secondary" onClick={() => this.exitModal()}>Cancel</Button>
+                        <ModalFooter>
+                            <Button color="primary">Save Workout Entry</Button>
+                            <Button color="secondary" onClick={() => this.exitModal()}>Cancel</Button>
+                        </ModalFooter>
                     </Form>
                 </ModalBody>
+
                 </Modal>
             </div>
         );

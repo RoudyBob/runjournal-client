@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ProSidebar, SidebarHeader, Menu, MenuItem, SidebarContent } from 'react-pro-sidebar';
-import { FaRunning, FaCalendarAlt, FaCloudDownloadAlt, FaUserCircle, FaChartLine, FaAward, FaEye, FaEdit } from "react-icons/fa";
+import { FaRunning, FaCalendarAlt, FaCloudDownloadAlt, FaUserCircle, FaChartLine, FaAward, FaEdit } from "react-icons/fa";
 import './Sidebar.scss';
 import { userInfo, planEntry, workoutEntry, runnerInfo } from './Main'
 import { stringOrDate } from 'react-big-calendar';
@@ -195,14 +195,14 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
     render() { 
 
         return (
-            <div id="sidebar">
-                <ChangeView token={this.props.token} userSettings={this.props.userSettings} runnerInfo={this.props.runnerInfo} updateViewAsUser={this.props.updateViewAsUser} viewAsUser={this.props.viewAsUser} changeViewModal={this.state.changeViewModal} changeViewToggle={this.changeViewToggle} />
-                <EditProfile token={this.props.token} userid={this.props.userid} updateUserSettings={this.props.updateUserSettings} userSettings={this.props.userSettings} editProfileModal={this.state.editProfileModal} editProfileToggle={this.editProfileToggle}/>
+            // <div className="sidebar">
                 <ProSidebar>
+                    <ChangeView token={this.props.token} userSettings={this.props.userSettings} runnerInfo={this.props.runnerInfo} updateViewAsUser={this.props.updateViewAsUser} viewAsUser={this.props.viewAsUser} changeViewModal={this.state.changeViewModal} changeViewToggle={this.changeViewToggle} />
+                    <EditProfile token={this.props.token} userid={this.props.userid} updateUserSettings={this.props.updateUserSettings} userSettings={this.props.userSettings} editProfileModal={this.state.editProfileModal} editProfileToggle={this.editProfileToggle}/>
                     <SidebarHeader>
                         <h4><FaUserCircle />{this.props.userSettings.firstname} {this.props.userSettings.lastname} </h4>
                         <Menu iconShape="square">
-                            {(this.props.userSettings.coach === true) ? <MenuItem icon={<FaEye />} onClick={() => this.changeViewToggle()} >Viewing: {this.state.runnerInfo.firstname} {this.state.runnerInfo.lastname}</MenuItem> : null}
+                            {(this.props.userSettings.coach === true) ? <MenuItem onClick={() => this.changeViewToggle()} >Viewing: {this.state.runnerInfo.firstname} {this.state.runnerInfo.lastname}</MenuItem> : null}
                             {/* {(this.props.userSettings.coach === true && this.props.viewAsUser === this.props.userSettings.userid) ? <MenuItem icon={<FaEye />} onClick={() => this.changeViewToggle()} >Viewing: You</MenuItem> : null} */}
                         </Menu>
                     </SidebarHeader>
@@ -213,36 +213,30 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
                         <MenuItem icon={<FaEdit />} onClick={() => this.editProfileToggle()}>Edit Profile</MenuItem>
                     </Menu>
                     <SidebarHeader>
-                        <div className="monthlystatsheader">
-                            <h4><FaChartLine />Monthly Stats</h4>
-                        </div>
+                        <h4><FaChartLine />Monthly Stats</h4>
                     </SidebarHeader>
                     <SidebarContent>
-                        <div className="monthlystatscontent">
-                            {(this.props.userSettings.defaultUnits === "mi") ? <p>Total Distance: {this.state.totalMiles.toFixed(2)}mi</p> : <p>Total Distance: {(this.state.totalMiles * 1.609344).toFixed(2)}km</p>}
-                            {(this.props.userSettings.defaultUnits === "mi") ? <p>Total Elevation Gain: {this.state.totalElevation.toFixed(2)}ft</p> : <p>Total Elevation Gain: {(this.state.totalElevation / 3.2808).toFixed(2)}m</p>}
-                            <p>Total Time: {this.state.totalHours}h{this.state.totalMinutes}m</p>
-                        </div>
+                        <h6>Total Distance: </h6>
+                        {(this.props.userSettings.defaultUnits === "mi") ? <p>{this.state.totalMiles.toFixed(2)}mi</p> : <p>{(this.state.totalMiles * 1.609344).toFixed(2)}km</p>}
+                        <h6>Total Elevation Gain: </h6>
+                        {(this.props.userSettings.defaultUnits === "mi") ? <p>{this.state.totalElevation.toFixed(2)}ft</p> : <p>{(this.state.totalElevation / 3.2808).toFixed(2)}m</p>}
+                        <h6>Total Time:</h6>
+                        <p>{this.state.totalHours}h{this.state.totalMinutes}m</p>
                     </SidebarContent>
                     <SidebarHeader>
-                        <div className="goalheader">
-                            <h4><FaAward />Race Countown</h4>
-                        </div>
+                        <h4><FaAward />Race Countown</h4>
                     </SidebarHeader>
                     <SidebarContent>
-                        <div className="goalcontent">
-                            <br/>
-                            <h6>Next Race: {this.state.nextRaceName}</h6>
-                            <h6>Next Race Date: {this.state.nextRaceDate.toString()}</h6>
-                            <br/>
-                            <h6>Time Until Race: </h6>
-                            Weeks: {this.state.weeksUntilRace}&nbsp;
-                            Days: {this.state.daysUntilRace}&nbsp;
-                            Hours: {this.state.hoursUntilRace}
-                        </div>
+                        <h6>Next Race: {this.state.nextRaceName}</h6>
+                        <h6>Next Race Date: {this.state.nextRaceDate.toString()}</h6>
+                        <br/>
+                        <h6>Time Until Race: </h6>
+                        Weeks: {this.state.weeksUntilRace}&nbsp;
+                        Days: {this.state.daysUntilRace}&nbsp;
+                        Hours: {this.state.hoursUntilRace}
                     </SidebarContent>
                 </ProSidebar>
-            </div>
+            // </div>
             
         );
     }

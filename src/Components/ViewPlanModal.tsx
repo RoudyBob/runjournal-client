@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Form, Label, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import { Form, Label, Button, Modal, ModalFooter, ModalHeader, ModalBody } from 'reactstrap';
 import APIURL from '../Helpers/environment';
 import { planEntry, userInfo } from './Main';
 
@@ -181,7 +181,7 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
 
     render() { 
         return (
-            <div>
+            <div className="viewplanmodal-div">
                 <Modal isOpen={this.props.viewPlanModal} toggle={() => this.exitModal()} className="viewplanmodal">
                 <ModalHeader toggle={() => this.exitModal()}>View or Modify a Plan Entry</ModalHeader>
                 <ModalBody>
@@ -221,11 +221,11 @@ class ViewPlanModal extends React.Component<ViewPlanModalProps, ViewPlanModalSta
                             <label>Notes</label>
                             <input type="text" className="form-control" value={this.props.selectedPlan.notes} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.updateNotes(e)} />
                         </div>
-                        <div className="input-button-row">
+                        <ModalFooter>
                             <Button color="primary">Save Changes</Button>
                             <Button color="danger" onClick={() => this.deletePlan()}>Delete Entry</Button>
                             <Button color="secondary" onClick={() => this.exitModal()}>Cancel</Button>
-                        </div>
+                        </ModalFooter>
                     </Form>
                 </ModalBody>
                 </Modal>

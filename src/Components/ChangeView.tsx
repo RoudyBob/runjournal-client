@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Form, Label, Col, Input, FormGroup, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import { Form, Label, Col, Input, FormGroup, Button, ModalFooter, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { runnerInfo, userInfo } from './Main';
 
 export interface ChangeViewProps {
@@ -54,7 +54,7 @@ class ChangeView extends React.Component<ChangeViewProps, ChangeViewState> {
 
     render() { 
         return (
-            <div>
+            <div className="changeview-div">
                 <Modal isOpen={this.props.changeViewModal} toggle={() => this.props.changeViewToggle} className="changeviewmodal">
                    <ModalHeader toggle={() => this.props.changeViewToggle()}>View As Runner</ModalHeader>
                     <ModalBody>
@@ -64,8 +64,10 @@ class ChangeView extends React.Component<ChangeViewProps, ChangeViewState> {
                             {(this.props.runnerInfo) ? this.props.runnerInfo.map((runner, index) => this.displayRunners(runner.id, index)) : <div></div> }
                             </Col>
                         </FormGroup>
-                            <Button color="primary">Save Plan Entry</Button>
+                        <ModalFooter>
+                            <Button color="primary">Switch to Runner</Button>
                             <Button color="secondary" onClick={() => this.props.changeViewToggle()}>Cancel</Button>
+                        </ModalFooter>
                         </Form>
                     </ModalBody>
                 </Modal>

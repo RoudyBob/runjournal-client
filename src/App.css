@@ -1,5 +1,11 @@
-.App {
+.app {
+  display: flex;
   text-align: center;
+  height: 100vh;
+  width: 100vw;
+  overflow: auto;
+  margin: 0px;
+  box-sizing: border-box;
 }
 
 .App-logo {
@@ -35,4 +41,271 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.homepage {
+  color: white;
+  margin-top: 66px;
+  width: 100vw;
+  margin: auto;
+}
+
+.homepage .title {
+  text-align: center;
+}
+
+.homepage .content {
+  margin-left: 10%;
+  text-align: left;
+  margin-right: 10%;
+}
+
+.homepage figure {
+  text-align: center;
+  align-content: center;
+}
+
+.homepage figcaption {
+  font-style: italic;
+}
+
+.main-wrapper {
+  color: white;
+  margin-top: 66px;
+  display: flex;
+  width: 100%;
+}
+
+.main-inner{
+  background-color: #FFFFFF ;
+  flex: 5;
+}
+
+.sidebar {
+  display: flex;
+  flex: 1;
+}
+
+.pro-sidebar {
+  background-color: #28487a;
+  flex: 1;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 10px;
+}
+
+.pro-sidebar-header {
+  color: #ecba2d;
+  text-align: center;
+  padding-top: 5px;
+}
+
+.pro-sidebar-header .pro-menu-item {
+  color: #dd4e4e !important;
+  margin-top: -10px;
+  padding-left: 45px;
+}
+
+.pro-sidebar-header .pro-inner-item:focus {
+  color: #dd4e4e !important;
+}
+
+.pro-sidebar-header .pro-inner-item:hover {
+  color: #dd4e4e !important;
+  transform: scale(1.1);
+  transition: all ease 100ms;
+}
+
+.pro-sidebar-header svg {
+  margin-right: 10px;
+  margin-top: -3px;
+}
+
+.pro-sidebar .pro-menu {
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+
+.pro-inner-item {
+  padding-left: 0px !important;
+}
+
+.pro-inner-item:focus {
+  color: #ffffff !important;
+}
+
+.pro-inner-item:hover {
+  color: #ecba2d !important;
+}
+
+.pro-icon-wrapper {
+  margin-right: 0px !important;
+}
+
+.pro-sidebar-content {
+  padding-top: 15px;
+  padding-left: 10px;
+}
+
+.mainpage {
+  margin-top: 100px;
+  color: white;
+}
+
+.logoutpage {
+  margin-top: 100px;
+  color: white;
+}
+
+.signup-login {
+  font-size: 13px !important;
+  padding-top: 10px !important;
+  color: #7f7d7d !important;
+  margin: 0 imp !important;
+}
+
+.calendar-wrapper {
+  padding-left: 100px;
+  padding-right: 100px;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  background-color: white;
+}
+
+.rbc-calendar {
+  color: #28487a;
+}
+
+.rbc-event.plan {
+  background-color: #4e6ba6;
+}
+
+.rbc-event.plan.rbc-selected {
+  background-color: #4e6ba6;
+  outline: none;
+}
+
+.rbc-event.workout {
+  background-color: #ecba2d;
+}
+
+.rbc-event.workout.rbc-selected {
+  background-color: #ecba2d;
+  outline: none;
+}
+
+.rbc-day-bg.rbc-today {
+  background-color: #4e6ba6;
+  opacity: 0.40;
+  color: white;
+}
+
+.rbc-show-more {
+  color: #28487a;
+}
+.rbc-toolbar-label {
+  font-size: x-large;
+}
+
+.form-check-label {
+  font-weight: normal;
+}
+
+.coacheslist {
+  height: 75px;
+  overflow: auto;
+}
+
+.fixed-top {
+  /* background-color: #f4d844; */
+  background-color: #f4d844;
+  box-shadow: 5px 1px 3px gray;
+}
+
+.header {
+  height: 56px;
+  width: 100%;
+  flex: 1;
+}
+
+.header .container {
+  margin: 0px;
+  display: flex;
+  width: 100%;
+}
+
+.header .container .navbar-home {
+  flex: 5;
+}
+
+.navbar-home {
+  padding-left: 10px;
+}
+
+.header .container .navbar-collapse {
+  flex: 1;
+}
+
+.nav-item {
+  padding-right: 10px;
+}
+
+.nav-item a:visited {
+  color: black;
+}
+
+.navbar-brand {
+  padding: 0px;
+}
+
+.navbar-brand img {
+  height: 50px;
+}
+
+.btn-primary {
+  /* background-color: #005dc0;
+  border-color: #005dc0; */
+  background-color: #0069d9;
+  border-color: #0069d9;
+}
+
+.btn-primary:hover {
+  background-color: #005dc0;
+  border-color: #005dc0;
+}
+
+.btn-warning {
+  /* background-color: #005dc0;
+  border-color: #005dc0; */
+  background-color: #ecba2d;
+  border-color: #ecba2d;
+}
+
+.btn-warning:hover {
+  background-color: #eab216;
+  border-color: #eab216;
+}
+
+.btn-danger {
+  /* background-color: #005dc0;
+  border-color: #005dc0; */
+  background-color: #d02828;
+  border-color: #d02828;
+}
+
+.btn-danger:hover {
+  background-color: #bb2424;
+  border-color: #bb2424;
+}
+
+.modal-footer {
+  border: none;
+}
+
+.choicemodal .modal-footer {
+  border: none;
+}
+
+.choicemodal .modal-header {
+  border: none;
 }

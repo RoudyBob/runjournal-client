@@ -16,9 +16,10 @@ class ImportModal extends React.Component<ImportModalProps, ImportModalState> {
         super(props);
         this.state = {};
     }
+    
     render() { 
         return (
-            <div>
+            <div className="importmodal-div">
                 <Modal isOpen={this.props.importModal} toggle={() => this.props.importToggle()} className="importmodal">
                 <ModalHeader toggle={() => this.props.importModal}>Import Workout from Strava</ModalHeader>
                 <ModalBody>

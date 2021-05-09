@@ -4,7 +4,7 @@ import { Form, Label } from 'reactstrap';
 import APIURL from '../Helpers/environment';
 
 export interface SignupProps extends RouteComponentProps{
-    updateToken: Function
+    updateToken: Function,
 }
  
 export interface SignupState {
@@ -28,15 +28,13 @@ class Signup extends React.Component<SignupProps, SignupState> {
             password: '',
             birthdate: '',
             startOfWeek: 'monday',
-            defaultUnit: 'standard',
+            defaultUnit: 'mi',
             coach: false
         };
     }
 
     handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(this.state.startOfWeek);
-        console.log(this.state.defaultUnit);
         fetch(`${APIURL}/user/signup`, {
             method: 'POST',
             body: JSON.stringify({
@@ -45,7 +43,6 @@ class Signup extends React.Component<SignupProps, SignupState> {
                     lastname: this.state.lastName,
                     email: this.state.email, 
                     password: this.state.password,
-                    birthdate: this.state.birthdate,
                     weekstart: this.state.startOfWeek,
                     defaultunits: this.state.defaultUnit,
                     coach: this.state.coach
@@ -57,7 +54,6 @@ class Signup extends React.Component<SignupProps, SignupState> {
         })
         .then((response) => response.json())
         .then((data) => {
-            console.log(data);
             this.props.updateToken(data.sessionToken, data.user.id);
             this.props.history.push('/main');
         })
@@ -92,11 +88,6 @@ class Signup extends React.Component<SignupProps, SignupState> {
                         </div>
 
                         <div className="form-group">
-                            <label>Birthdate</label>
-                            <input type="date" className="form-control" placeholder="01/01/1900" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ birthdate: e.currentTarget.value })} required />
-                        </div>
-
-                        <div className="form-group">
                             <label htmlFor="weekstart">Start of Week:</label>
                             <select className="form-control" id="weekstart" value={this.state.startOfWeek} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => (e.currentTarget.value === "monday") ? this.setState({ startOfWeek: "monday"}) : this.setState({ startOfWeek: "sunday" })} >
                                 <option value="monday">Monday</option>
@@ -106,9 +97,9 @@ class Signup extends React.Component<SignupProps, SignupState> {
 
                         <div className="form-group">
                             <label htmlFor="defaultunit">Default Unit:</label>
-                            <select className="form-control" id="defaultunit" value={this.state.defaultUnit} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => (e.currentTarget.value === "standard") ? this.setState({ defaultUnit: "standard"}) : this.setState({ defaultUnit: "metric" })}>
-                                <option value="standard">Standard</option>
-                                <option value="metric">Metric</option>
+                            <select className="form-control" id="defaultunit" value={this.state.defaultUnit} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => (e.currentTarget.value === "mi") ? this.setState({ defaultUnit: "mi"}) : this.setState({ defaultUnit: "km" })}>
+                                <option value="mi">mi</option>
+                                <option value="km">km</option>
                             </select>
                         </div>
 

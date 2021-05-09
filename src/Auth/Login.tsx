@@ -1,15 +1,16 @@
 import React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
-import { Form } from 'reactstrap';
+import { Form, Alert } from 'reactstrap';
 import APIURL from '../Helpers/environment';
 
 export interface LoginProps extends RouteComponentProps{
-    updateToken: Function
+    updateToken: Function,
 }
  
 export interface LoginState {
     email: string,
-    password: string
+    password: string,
+    alertVisible: boolean
 }
  
 class Login extends React.Component<LoginProps, LoginState> {
@@ -17,7 +18,8 @@ class Login extends React.Component<LoginProps, LoginState> {
         super(props);
         this.state = { 
             email: '', 
-            password: ''  
+            password: '',
+            alertVisible: false
         };
     }
 
@@ -32,15 +34,29 @@ class Login extends React.Component<LoginProps, LoginState> {
         })
         .then((response) => response.json())
         .then((data) => {
-            console.log(data);
-            this.props.updateToken(data.sessionToken, data.user.id);
-            this.props.history.push('/main');
-        })
+            if (data.hasOwnProperty("error")) {
+                this.setState({ alertVisible: true })
+            } else {
+                this.props.updateToken(data.sessionToken, data.user.id);
+                this.props.history.push('/main');
+            }
+        })  
+    }
+
+    toggleAlert = () => {
+        this.setState(prevState => ({
+            alertVisible: !prevState.alertVisible
+        }));
     }
 
     render() { 
         return ( 
             <div className="auth-inner">
+                <div className="failedLogin">
+                    <Alert color="danger" isOpen={this.state.alertVisible} toggle={this.toggleAlert}>
+                        Login Failed - Try Again.
+                    </Alert>
+                </div>
                 <Form onSubmit={this.handleSubmit}>
                     <h3>RunJournal Sign In</h3>
 
@@ -53,14 +69,6 @@ class Login extends React.Component<LoginProps, LoginState> {
                         <label>Password</label>
                         <input type="password" className="form-control" placeholder="Enter password" onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ password: e.currentTarget.value })} required />
                     </div>
-
-                    {/* Do I want to allow remembering password?
-                    <div className="form-group">
-                        <div className="custom-control custom-checkbox">
-                            <input type="checkbox" className="custom-control-input" id="passwordcheck" />
-                            <label className="custom-control-label" htmlFor="passwordcheck">Remember me</label>
-                        </div>
-                    </div> */}
 
                     <br/>
                     <button type="submit" className="btn btn-primary btn-block">Submit</button>

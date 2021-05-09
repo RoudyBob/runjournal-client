@@ -1,6 +1,7 @@
 import * as React from 'react';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 
-export interface LogoutProps {
+export interface LogoutProps extends RouteComponentProps {
     clearToken: Function
 }
  
@@ -16,15 +17,12 @@ class Logout extends React.Component<LogoutProps, LogoutState> {
 
     componentDidMount () {
         this.props.clearToken();
+        this.props.history.push('/');
     }
     
     render() { 
-        return (
-            <div className="logoutpage">
-                <h1>You have been logged out.</h1>
-            </div>
-        );
+        return (<div></div>);
     }
 }
  
-export default Logout;
+export default withRouter(Logout);

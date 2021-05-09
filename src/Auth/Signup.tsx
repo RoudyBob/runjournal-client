@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { Form, Label } from 'reactstrap';
-import APIURL from '../Helpers/environment';
+import { APIURL } from '../Helpers/environment';
 
 export interface SignupProps extends RouteComponentProps{
     updateToken: Function,

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Form, Label, Button, Modal, ModalFooter, ModalHeader, ModalBody } from 'reactstrap';
-import APIURL from '../Helpers/environment';
+import { APIURL } from '../Helpers/environment';
 import { planEntry, userInfo } from './Main';
 
 export interface ViewPlanModalProps {

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button, FormGroup, Form, Col, Label, Input, Modal, ModalFooter, ModalHeader, ModalBody } from 'reactstrap';
-import APIURL from '../Helpers/environment';
+import { APIURL } from '../Helpers/environment';
 import { userInfo } from './Main';
 
 export interface EditProfileProps {

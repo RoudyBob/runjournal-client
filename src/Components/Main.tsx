@@ -9,7 +9,7 @@ import ViewWorkoutModal from './ViewWorkoutModal';
 import ImportModal from './ImportModal';
 import ChoiceModal from './ChoiceModal';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import APIURL from '../Helpers/environment';
+import { APIURL } from '../Helpers/environment';
 
 export interface MainProps {
     token: string,

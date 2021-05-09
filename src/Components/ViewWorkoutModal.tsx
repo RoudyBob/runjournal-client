@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { stringOrDate } from 'react-big-calendar';
 import { Alert, Form, Label, Button, Modal, ModalFooter, ModalHeader, ModalBody } from 'reactstrap';
-import APIURL from '../Helpers/environment';
+import { APIURL } from '../Helpers/environment';
 import { userInfo, workoutEntry } from './Main';
 
 export interface ViewWorkoutModalProps {

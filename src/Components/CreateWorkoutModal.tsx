@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Alert, Form, Label, Button, Modal, ModalFooter, ModalHeader, ModalBody } from 'reactstrap';
-import APIURL from '../Helpers/environment';
+import { APIURL } from '../Helpers/environment';
 import { slotInfo, userInfo } from './Main';
 
 export interface CreateWorkoutModalProps {

@@ -4,7 +4,7 @@ import { FaRunning, FaCalendarAlt, FaCloudDownloadAlt, FaUserCircle, FaChartLine
 import './Sidebar.scss';
 import { userInfo, planEntry, workoutEntry, runnerInfo } from './Main'
 import { stringOrDate } from 'react-big-calendar';
-import APIURL from '../Helpers/environment';
+import { APIURL } from '../Helpers/environment';
 import ChangeView from './ChangeView';
 import EditProfile from './EditProfile';
 

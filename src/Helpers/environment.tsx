@@ -15,4 +15,4 @@ switch (window.location.hostname) {
         IMGURL = 'https://myrunjournal.herokuapp.com';
 }
 
-export default APIURL;
+export {APIURL, IMGURL};

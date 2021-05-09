@@ -28,7 +28,7 @@ class Header extends React.Component<HeaderProps, HeaderState> {
             <div className="header">
                 <nav className="navbar navbar-expand-lg navbar-light fixed-top">
                         <div className="navbar-home">
-                            {this.props.token ? <Link className="navbar-brand" to={"/main"}>{this.renderImg("runjournal.png", "Run Journal Logo", "352")}</Link> : <Link className="navbar-brand" to={"/"}><img src="http://localhost:3001/runjournal.png" alt="RunJournal Logo" /></Link>}
+                            {this.props.token ? <Link className="navbar-brand" to={"/main"}>{this.renderImg("runjournal.png", "Run Journal Logo")}</Link> : <Link className="navbar-brand" to={"/"}>{this.renderImg("runjournal.png", "Run Journal Logo")}</Link>}
                         </div>
                         <div className="collapse navbar-collapse" id="main-navbar">
                             <ul className="navbar-nav ml-auto">

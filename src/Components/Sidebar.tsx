@@ -145,7 +145,6 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
     };
     
     getRunnerForCoach= () => {
-        console.log(`${APIURL}/user/${this.props.viewAsUser}`)
         fetch(`${APIURL}/user/${this.props.viewAsUser}`, {
             method: 'GET',
             headers: new Headers ({

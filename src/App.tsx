@@ -39,9 +39,11 @@ class App extends React.Component<AppProps, AppState> {
     return (this.state.sessionToken ? <Main token={this.state.sessionToken} userid={this.state.userid} /> : <Redirect to="/" />);
   };
 
-  updateToken = (newToken: string) => {
+  updateToken = (newToken: string, newUserid: string, newUnits: string) => {
     localStorage.setItem('token', newToken);
     this.setState({ sessionToken: newToken});
+    localStorage.setItem('userid', newUserid);
+    this.setState({ userid: newUserid });
   }
 
   clearToken = () => {

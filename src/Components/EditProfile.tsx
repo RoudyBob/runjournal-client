@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Alert, FormGroup, Form, Col, Label, Input, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import { FormGroup, Form, Col, Label, Input, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import APIURL from '../Helpers/environment';
 import { userInfo } from './Main';
 
@@ -41,7 +41,6 @@ class EditProfile extends React.Component<EditProfileProps, EditProfileState> {
     }
 
     fetchCoaches = () => {
-        console.log(`${APIURL}/team`)
         fetch(`${APIURL}/team`, {
             method: 'GET',
             headers: new Headers({
@@ -51,11 +50,8 @@ class EditProfile extends React.Component<EditProfileProps, EditProfileState> {
         })
         .then((response) => response.json())
         .then((teams) => {
-            console.log(teams);
-            console.log(this.props.userid)
             teams.forEach((coach: coachInfo) => {
                 if (coach.runners.includes(parseInt(this.props.userid))) {
-                    console.log('found!')
                     this.setState({
                         coaches: [...this.state.coaches, {
                             userId: coach.userId,
@@ -82,7 +78,7 @@ class EditProfile extends React.Component<EditProfileProps, EditProfileState> {
 
     updateSettings = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(this.props.userSettings);
+        // console.log(this.props.userSettings);
         fetch(`${APIURL}/user/${this.props.userid}`, {
             method: 'GET',
             headers: new Headers({
@@ -113,7 +109,7 @@ class EditProfile extends React.Component<EditProfileProps, EditProfileState> {
                 })
                 .then((response) => response.json())
                 .then((data) => {
-                    console.log(data);
+                    // console.log(data);
                     this.props.editProfileToggle();
                 })
             } else {
@@ -136,7 +132,7 @@ class EditProfile extends React.Component<EditProfileProps, EditProfileState> {
                     })
                     .then((response) => response.json())
                     .then((data) => {
-                        console.log(data);
+                        // console.log(data);
                     })
                 } else {
                     // This person is no longer a coach - need to delete team
@@ -149,7 +145,7 @@ class EditProfile extends React.Component<EditProfileProps, EditProfileState> {
                     })
                     .then((response) => response.json())
                     .then((data) => {
-                        console.log(data);
+                        // console.log(data);
                     })
                 };
                 fetch(`${APIURL}/user/${this.props.userid}`, {
@@ -171,14 +167,13 @@ class EditProfile extends React.Component<EditProfileProps, EditProfileState> {
                 })
                 .then((response) => response.json())
                 .then((data) => {
-                    console.log(data);
+                    // console.log(data);
                     this.props.editProfileToggle();
                 })
             };
         });
         this.state.coaches.forEach((coach) => {
             if (coach.checked && !coach.runners.includes(parseInt(this.props.userid))) {
-                console.log(`coach ${coach.userId} was checked for ${this.props.userid}`)
                 fetch(`${APIURL}/team/join/${coach.userId}`, {
                     method: 'PUT',
                     headers: new Headers({
@@ -188,10 +183,9 @@ class EditProfile extends React.Component<EditProfileProps, EditProfileState> {
                 })
                 .then((response) => response.json())
                 .then((data) => {
-                    console.log(data);
+                    // console.log(data);
                 })
             } else if (!coach.checked) {
-                console.log(`coach ${coach.userId} was unchecked for ${this.props.userid}`)
                 fetch(`${APIURL}/team/leave/${coach.userId}`, {
                     method: 'PUT',
                     headers: new Headers({
@@ -201,7 +195,7 @@ class EditProfile extends React.Component<EditProfileProps, EditProfileState> {
                 })
                 .then((response) => response.json())
                 .then((data) => {
-                    console.log(data);
+                    // console.log(data);
                 })
             }
         })
@@ -294,7 +288,7 @@ class EditProfile extends React.Component<EditProfileProps, EditProfileState> {
 
     componentDidMount() {
         this.fetchCoaches();
-        console.log(this.props.userSettings);
+        // console.log(this.props.userSettings);
     }
 
     componentDidUpdate(prevProps: EditProfileProps, prevState: EditProfileState) {

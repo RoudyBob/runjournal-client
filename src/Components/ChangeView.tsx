@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { Form, Label, Col, Input, FormGroup, Button, Modal, ModalHeader, ModalBody, ModalFooter, InputGroupAddon, InputGroupText } from 'reactstrap';
+import { Form, Label, Col, Input, FormGroup, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { runnerInfo, userInfo } from './Main';
-import APIURL from '../Helpers/environment';
 
 export interface ChangeViewProps {
     token: string,

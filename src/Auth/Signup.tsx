@@ -35,8 +35,6 @@ class Signup extends React.Component<SignupProps, SignupState> {
 
     handleSubmit = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(`${APIURL}/user/signup`)
-        console.log(this.state.email);
         fetch(`${APIURL}/user/signup`, {
             method: 'POST',
             body: JSON.stringify({
@@ -45,7 +43,6 @@ class Signup extends React.Component<SignupProps, SignupState> {
                     lastname: this.state.lastName,
                     email: this.state.email, 
                     password: this.state.password,
-                    birthdate: this.state.birthdate,
                     weekstart: this.state.startOfWeek,
                     defaultunits: this.state.defaultUnit,
                     coach: this.state.coach
@@ -57,8 +54,7 @@ class Signup extends React.Component<SignupProps, SignupState> {
         })
         .then((response) => response.json())
         .then((data) => {
-            console.log(data.sessionToken);
-            this.props.updateToken(data.sessionToken);
+            this.props.updateToken(data.sessionToken, data.user.id);
             this.props.history.push('/main');
         })
     }

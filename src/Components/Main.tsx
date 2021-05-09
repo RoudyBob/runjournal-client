@@ -417,7 +417,7 @@ class Main extends React.Component<MainProps, MainState> {
         })
         .then((response) => response.json())
         .then((user) => {
-            console.log(user);
+            // console.log(user);
             if (user.coach) {
                 if (user.team.runners) {
                     // Before you begin, add current user to runnerInfo array so they can select themselves to view

@@ -1,4 +1,6 @@
 import * as React from 'react';
+import IMGURL from '../Helpers/environment';
+
 
 export interface HomeProps {
     token: string | null,
@@ -14,18 +16,25 @@ class Home extends React.Component<HomeProps, HomeState> {
         this.state = {};
     }
 
+    renderImg = (filename: string, altText: string, width: string) => {
+        let url = `${IMGURL}/${filename}`
+        return (
+            <img src={url} alt={altText} width={width} />
+        )
+    }
+
     render() { 
         return (
             <div className="homepage">
                 <div className="title">
                     <h1>Introducing...</h1>
-                    <img src="http://localhost:3001/runjournal.png" alt="Run Journal Logo" width="352"></img>
+                    {this.renderImg("runjournal.png", "Run Journal Logo", "352")}
                 </div>
                 <div className="content">
                     <h4>What is RunJournal?</h4>
                     <p>Most runners have heard that it's smart to have a solid plan and follow that plan as closely as then can if they want to become stronger over time and have success in any sort of competitive event. The challenge with training plans for runners is that they are complicated to build and manage. There are applications and web services like Garmin, Strava, and TrainingPeaks which deliver all sorts of functionality but which are expensive and complicated to use. Put off by this, some runners resort to paper training logs or very simple spreadsheets to track their weekly mileage goals and their workouts which is cumbersome to manage.</p>
                     <figure>
-                        <img src="http://localhost:3001/sheets.png" alt="screenshot of a running plan in Google Sheets" width="400" />
+                        {this.renderImg("sheets.png", "screenshot of a running plan in Google Sheets", "400")}
                         <figcaption>Look familiar? Way too much work!</figcaption>
                     </figure>
                     {/* <p>Users of RunJournal are able to easily build a training plan of their own creation, one they borrow from a fellow runner, or even one provided to them by their coach. RunJournal will help them track their workouts and progress towards the goals they have set for themselves. </p> */}

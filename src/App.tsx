@@ -8,6 +8,7 @@ import Home from "./Components/Home";
 import Main from "./Components/Main";
 import Auth from "./Auth/Auth";
 import Logout from "./Auth/Logout";
+import StravaRedirect from './Components/StravaRedirect';
 
 export interface AppProps {
     
@@ -75,6 +76,7 @@ class App extends React.Component<AppProps, AppState> {
               <Route path="/login"><Auth updateToken={this.updateToken} showLogin={true} /></Route>
               <Route path="/signup"><Auth updateToken={this.updateToken} showLogin={false} /></Route>
               <Route path="/logout"><Logout clearToken={this.clearToken} /></Route>
+              <Route path="/redirect"><StravaRedirect /></Route>
             </Switch>
   
   

@@ -1,5 +1,8 @@
 import * as React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { default as strava, Strava } from 'strava-v3';
+
+
 
 export interface ImportModalProps {
     token: string,
@@ -8,17 +11,21 @@ export interface ImportModalProps {
 }
  
 export interface ImportModalState {
-
+    scope: string,
+    redirectUrl: string
 }
  
 class ImportModal extends React.Component<ImportModalProps, ImportModalState> {
     constructor(props: ImportModalProps) {
         super(props);
-        this.state = {};
+        this.state = {
+            scope: 'read',
+            redirectUrl: 'http://localhost:3001/redirect'
+        };
     }
 
     componentDidMount() {
-        console.log('mounting')
+        console.log(process.env.REACT_APP_CLIENT_ID);
     }
 
     exitModal = () => {
@@ -28,6 +35,8 @@ class ImportModal extends React.Component<ImportModalProps, ImportModalState> {
 
     handleLogin = () => {
         console.log('in handleLogin');
+        window.location.href = `http://www.strava.com/oauth/authorize?client_id=${process.env.REACT_APP_CLIENT_ID}&response_type=code&redirect_uri=${this.state.redirectUrl}/exchange_token&approval_prompt=force&scope=${this.state.scope}`;
+
     }
     
     render() { 

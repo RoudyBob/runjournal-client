@@ -1,46 +1,20 @@
-# Getting Started with Create React App
+# RunJournal Project Information
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Whether you consider yourself a hobby jogger or a competitive runner, RunJournal makes it easy for you to build and manage a training plan for your next goal race.
 
-## Available Scripts
+## User Stories
 
-In the project directory, you can run:
+Most runners have heard that it's smart to have a solid plan and follow that plan as closely as then can if they want to become stronger over time and have success in any sort of competitive event. Doing too much work can lead to injury and burnout, while not doing enough will leave them toeing the start line of their chosen goal race underprepared. Even if someone isn't looking to compete and is just looking to enjoy the benefits of running on a regular basis, it's motivating to keep track of their progress and the volume of work they are able to do.
 
-### `npm start`
+The challenge with training plans for runners is that they are complicated to build and manage. There are applications and web services like Garmin, Strava, and TrainingPeaks which deliver all sorts of functionality but which are expensive and complicated to use. Put off by this, some runners resort to paper training logs or very simple spreadsheets to track their weekly mileage goals and their workouts which is cumbersome to manage.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Users of RunJournal are able to easily build a training plan of their own creation, one they borrow from a fellow runner, or even one provided to them by their coach. RunJournal will help them track their workouts and progress towards the goals they have set for themselves. 
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### User 1: The Runner
 
-### `npm test`
+As a runner, a user can use the app to set future goals, create training plans and keep a journal of their workouts including their own notes about the effort as well as information pulled from various sources about temperature, humidity, air quality, etc. The application will provide guidance around some basic training plan concepts like week over week volume increases and help them keep track of how much time they have until their event.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### User 2: The Coach
 
-### `npm run build`
+As a coach, a user can use the app to request permission from a runner to view and edit their training plan. Once the runner has granted permission to the coach, that user can view that runner's plan and workouts or even create a plan for them to follow and track progress.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).

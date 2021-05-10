@@ -2,6 +2,12 @@
 
 Whether you consider yourself a hobby jogger or a competitive runner, RunJournal makes it easy for you to build and manage a training plan for your next goal race.
 
+## Technical Details
+
+Local settings and variables for use with Strava integration are stored in a local .env file. You will need to recreate yourself and provide your own values when cloning.
+
+Uses a significant numbers of libraries - Pro Sidebar, Big Calendar, etc. Make sure to: npm install - details are in the package.json provided in the repository.
+
 ## User Stories
 
 Most runners have heard that it's smart to have a solid plan and follow that plan as closely as then can if they want to become stronger over time and have success in any sort of competitive event. Doing too much work can lead to injury and burnout, while not doing enough will leave them toeing the start line of their chosen goal race underprepared. Even if someone isn't looking to compete and is just looking to enjoy the benefits of running on a regular basis, it's motivating to keep track of their progress and the volume of work they are able to do.

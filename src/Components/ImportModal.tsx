@@ -8,7 +8,7 @@ export interface ImportModalProps {
 }
  
 export interface ImportModalState {
-    
+
 }
  
 class ImportModal extends React.Component<ImportModalProps, ImportModalState> {
@@ -16,14 +16,27 @@ class ImportModal extends React.Component<ImportModalProps, ImportModalState> {
         super(props);
         this.state = {};
     }
+
+    componentDidMount() {
+        console.log('mounting')
+    }
+
+    exitModal = () => {
+
+        this.props.importToggle();
+    }
+
+    handleLogin = () => {
+        console.log('in handleLogin');
+    }
     
     render() { 
         return (
             <div className="importmodal-div">
-                <Modal isOpen={this.props.importModal} toggle={() => this.props.importToggle()} className="importmodal">
+                <Modal isOpen={this.props.importModal} toggle={() => this.exitModal()} className="importmodal">
                 <ModalHeader toggle={() => this.props.importModal}>Import Workout from Strava</ModalHeader>
                 <ModalBody>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                    <button onClick={this.handleLogin}>Connect with Strava</button>
                 </ModalBody>
                 <ModalFooter>
                     <Button color="primary" onClick={() => this.props.importToggle()}>Do Something</Button>{' '}

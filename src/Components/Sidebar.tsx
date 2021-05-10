@@ -15,6 +15,8 @@ export interface SidebarProps {
     createPlanModal: boolean,
     createWorkoutToggle: Function,
     createWorkoutModal: boolean,
+    importModal: Boolean,
+    importToggle: Function,
     userSettings: userInfo,
     updateUserSettings: Function,
     allWorkouts: Array<workoutEntry>
@@ -209,7 +211,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
                     <Menu iconShape="square">
                         <MenuItem icon={<FaCalendarAlt />} onClick={() => this.props.createPlanToggle()}>Create Plan Entry</MenuItem>
                         <MenuItem icon={<FaRunning />} onClick={() => this.props.createWorkoutToggle()}>Record Workout</MenuItem>
-                        <MenuItem icon={<FaCloudDownloadAlt />}>Import Workout</MenuItem>
+                        <MenuItem icon={<FaCloudDownloadAlt />} onClick={() => this.props.importToggle()}>Import Workout</MenuItem>
                         <MenuItem icon={<FaEdit />} onClick={() => this.editProfileToggle()}>Edit Profile</MenuItem>
                     </Menu>
                     <SidebarHeader>

@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
+import _ from "lodash";
 
 export interface StravaRedirectProps extends RouteComponentProps{
-    
+
 }
  
 export interface StravaRedirectState {
@@ -15,42 +16,33 @@ class StravaRedirect extends React.Component<StravaRedirectProps, StravaRedirect
         this.state = {};
     }
 
-    testAuthGetter = async (authTok: string) => {
+    authGetter = async (authTok: string) => {
+        console.log(`in testAuthGetter`)
         try {
-            const response = await fetch(
-                `https://www.strava.com/api/v3/oauth/token?client_id=${REACT_APP_CLIENT_ID}&client_secret=${REACT_APP_CLIENT_SECRET}&code=${authTok}&grant_type=authorization_code`, {
-                    method: 'POST'
-                });
-                return response
-            } catch (error) {
-                console.log(error);
+            let response = await fetch(
+            `https://www.strava.com/api/v3/oauth/token?client_id=${process.env.REACT_APP_CLIENT_ID}&client_secret=${process.env.REACT_APP_CLIENT_SECRET}&code=${authTok}&grant_type=authorization_code`, {
+                method: 'POST'
+            });
+            let tokenData = await response.json();
+            console.log(tokenData);
+            return tokenData;
+        } catch (error) {
+            console.log(error);
         }
     };
 
-    setUser = (data: any) => {
-        return {
-            type: "SET_USER",
-            payload: data,
-        };
-    };
-
-    setUserActivities = (data: any) => {
-        return {
-            type: "SET_USER_ACTIVITIES",
-            payload: data,
-        };
-    };
-
-    getUserData = async (userID: any, accessToken: any) => {
+    getUserData = async (athleteid: string, accessToken: string) => {
+        console.log(`in getUserData`)
         try {
-            const response = await fetch(
-                `https://www.strava.com/api/v3/athletes/${userID}/stats`, {
+            let response = await fetch(
+                `https://www.strava.com/api/v3/athletes/${athleteid}/stats`, {
                     method: 'GET',
                     headers: new Headers({
                         'Authorization': `Bearer ${accessToken}`
                     })
             });
-            return response;
+            let userData = await response.json();
+            return userData;
         } catch (error) {
             console.log(error);
         }
@@ -69,17 +61,22 @@ class StravaRedirect extends React.Component<StravaRedirectProps, StravaRedirect
                 var stravaAuthToken = (location.search).split("&")[1].slice(5);
 
                 // Post Request to Strava (with AuthToken) which returns Refresh Token and and Access Token
-                var tokens = await this.testAuthGetter(stravaAuthToken);
-                this.setUser(tokens);
-                if (tokens) {var accessToken = tokens.access_token};
-                if (tokens) {var userID = tokens.athlete.id};
+                let stravaTokens = await this.authGetter(stravaAuthToken);
+                // let accessToken = stravaTokens.access_token;
+                // let athleteId = stravaTokens.athlete.id;
 
-                // Axios request to get users info
-                const user = await this.getUserData(userID, accessToken);
-                this.setUserActivities(user);
 
+                // const stravaUser = await this.getUserData(athleteId, accessToken);
+                // console.log(stravaUser);
+                // this.setUserActivities(user);
+                // const userRuns = await this.getUserRuns(athleteId, accessToken);
+                // console.log(userRuns);
+                // console.log(stravaTokens.access_token)
                 // Once complete, go to display page
-                history.push("/");
+
+                localStorage.setItem('stravaToken', stravaTokens.access_token,);
+                localStorage.setItem('stravaId', stravaTokens.athlete.id);
+                history.push("/")
             } catch (error) {
                 history.push("/");
             }
@@ -87,9 +84,9 @@ class StravaRedirect extends React.Component<StravaRedirectProps, StravaRedirect
         authenticate();
     }
 
-    render() { 
-        return (<div>Loading</div>);
-    }
+    render() {
+        return(<div></div>);
+    };
 }
  
-export default StravaRedirect;
+export default withRouter(StravaRedirect);

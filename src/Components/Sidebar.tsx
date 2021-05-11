@@ -7,6 +7,7 @@ import { stringOrDate } from 'react-big-calendar';
 import { APIURL } from '../Helpers/environment';
 import ChangeView from './ChangeView';
 import EditProfile from './EditProfile';
+import ImportModal from './ImportModal';
 
 export interface SidebarProps {
     token: string,
@@ -15,8 +16,6 @@ export interface SidebarProps {
     createPlanModal: boolean,
     createWorkoutToggle: Function,
     createWorkoutModal: boolean,
-    importModal: Boolean,
-    importToggle: Function,
     userSettings: userInfo,
     updateUserSettings: Function,
     allWorkouts: Array<workoutEntry>
@@ -40,6 +39,9 @@ export interface SidebarState {
     runnerInfo: RunnerData,
     changeViewModal: boolean,
     editProfileModal: boolean,
+    importModal: boolean,
+    scope: string,
+    redirectUrl: string,
 }
 
 export interface RunnerData {
@@ -69,7 +71,10 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
                 runnerid: 0,
             },
             changeViewModal: false,
-            editProfileModal: false
+            editProfileModal: false,
+            importModal: false,
+            scope: 'read,activity:read_all',
+            redirectUrl: 'http://localhost:3001/redirect'
         };
     }
 
@@ -194,11 +199,22 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
         }));
     }
 
+    importToggle = () => {
+        this.setState(prevState => ({
+            importModal: !prevState.importModal
+        }));
+    }
+
+    stravaLogin = () => {
+        window.location.href = `http://www.strava.com/oauth/authorize?client_id=${process.env.REACT_APP_CLIENT_ID}&response_type=code&redirect_uri=${this.state.redirectUrl}/exchange_token&approval_prompt=force&scope=${this.state.scope}`;
+    }
+
     render() { 
 
         return (
             // <div className="sidebar">
                 <ProSidebar>
+                    <ImportModal token={this.props.token} importToggle={this.importToggle} importModal={this.state.importModal} />
                     <ChangeView token={this.props.token} userSettings={this.props.userSettings} runnerInfo={this.props.runnerInfo} updateViewAsUser={this.props.updateViewAsUser} viewAsUser={this.props.viewAsUser} changeViewModal={this.state.changeViewModal} changeViewToggle={this.changeViewToggle} />
                     <EditProfile token={this.props.token} userid={this.props.userid} updateUserSettings={this.props.updateUserSettings} userSettings={this.props.userSettings} editProfileModal={this.state.editProfileModal} editProfileToggle={this.editProfileToggle}/>
                     <SidebarHeader>
@@ -211,7 +227,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
                     <Menu iconShape="square">
                         <MenuItem icon={<FaCalendarAlt />} onClick={() => this.props.createPlanToggle()}>Create Plan Entry</MenuItem>
                         <MenuItem icon={<FaRunning />} onClick={() => this.props.createWorkoutToggle()}>Record Workout</MenuItem>
-                        <MenuItem icon={<FaCloudDownloadAlt />} onClick={() => this.props.importToggle()}>Import Workout</MenuItem>
+                        {(localStorage.getItem('stravaToken')) ? <MenuItem icon={<FaCloudDownloadAlt />} onClick={() => this.importToggle()}>Import Workout</MenuItem> : <MenuItem icon={<FaCloudDownloadAlt />} onClick={() => this.stravaLogin()}>Connect with Strava</MenuItem>}
                         <MenuItem icon={<FaEdit />} onClick={() => this.editProfileToggle()}>Edit Profile</MenuItem>
                     </Menu>
                     <SidebarHeader>

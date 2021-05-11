@@ -6,10 +6,10 @@ import CreatePlanModal from './CreatePlanModal';
 import CreateWorkoutModal from './CreateWorkoutModal';
 import ViewPlanModal from './ViewPlanModal';
 import ViewWorkoutModal from './ViewWorkoutModal';
-import ImportModal from './ImportModal';
 import ChoiceModal from './ChoiceModal';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { APIURL } from '../Helpers/environment';
+import { stravaToken } from '../App';
 
 export interface MainProps {
     token: string,
@@ -26,7 +26,6 @@ export interface MainState {
     createWorkoutModal: boolean,
     viewWorkoutModal: boolean,
     selectedWorkout: workoutEntry,
-    importModal: boolean,
     choiceModal: boolean,
     events: Array<calendarEvent>,
     selectedSlotInfo: slotInfo,
@@ -141,7 +140,6 @@ class Main extends React.Component<MainProps, MainState> {
                 notes: '',
                 userId: 0
             },
-            importModal: false,
             choiceModal: false,
             events: [{
                 start: null,
@@ -318,12 +316,6 @@ class Main extends React.Component<MainProps, MainState> {
             });
         });
         this.viewWorkoutToggle();
-    }
-
-    importToggle = () => {
-        this.setState(prevState => ({
-            importModal: !prevState.importModal
-        }));
     }
 
     newEntry = ({ start, end } : slotInfo) => {
@@ -570,7 +562,6 @@ class Main extends React.Component<MainProps, MainState> {
                 <CreateWorkoutModal token={this.props.token} viewAsUser={this.state.viewAsUser} userSettings={this.state.userSettings} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} updateSelectedSlot={this.updateSelectedWorkoutSlotInfo} selectedSlotInfo={this.state.selectedSlotInfo} updateEvents={this.updateEvents}/>
                 <ViewPlanModal token={this.props.token} viewAsUser={this.state.viewAsUser} userSettings={this.state.userSettings} viewPlanToggle={this.viewPlanToggle} viewPlanModal={this.state.viewPlanModal} selectedPlan={this.state.selectedPlan} updateSelectedPlan={this.updateSelectedPlan} updateEvents={this.updateEvents} />
                 <ViewWorkoutModal token={this.props.token} viewAsUser={this.state.viewAsUser} userSettings={this.state.userSettings} viewWorkoutToggle={this.viewWorkoutToggle} viewWorkoutModal={this.state.viewWorkoutModal} selectedWorkout={this.state.selectedWorkout} updateSelectedWorkout={this.updateSelectedWorkout} updateEvents={this.updateEvents} />
-                <ImportModal token={this.props.token} importToggle={this.importToggle} importModal={this.state.importModal} />
                 <ChoiceModal choiceToggle={this.choiceToggle} createWorkoutToggle={this.createWorkoutToggle} createPlanToggle={this.createPlanToggle} choiceModal={this.state.choiceModal} />                
                 
                 <div className="main-inner">
@@ -601,7 +592,7 @@ class Main extends React.Component<MainProps, MainState> {
                     </div>
                 </div>
 
-                <Sidebar token={this.props.token} userid={this.props.userid} updateUserSettings={this.updateUserSettings} userSettings={this.state.userSettings} runnerInfo={this.state.runnerInfo} viewAsUser={this.state.viewAsUser} updateViewAsUser={this.updateViewAsUser} importToggle={this.importToggle} importModal={this.state.importModal} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} allWorkouts={this.state.allWorkouts} allPlans={this.state.allPlans}/>
+                <Sidebar token={this.props.token} userid={this.props.userid} updateUserSettings={this.updateUserSettings} userSettings={this.state.userSettings} runnerInfo={this.state.runnerInfo} viewAsUser={this.state.viewAsUser} updateViewAsUser={this.updateViewAsUser} createPlanToggle={this.createPlanToggle} createPlanModal={this.state.createPlanModal} createWorkoutToggle={this.createWorkoutToggle} createWorkoutModal={this.state.createWorkoutModal} allWorkouts={this.state.allWorkouts} allPlans={this.state.allPlans}/>
             </div>
         );
     }

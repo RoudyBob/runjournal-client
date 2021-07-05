@@ -11,10 +11,13 @@ import EditProfile from './EditProfile';
 export interface SidebarProps {
     token: string,
     userid: string,
+    navigateDate: Date,
     createPlanToggle: Function,
     createPlanModal: boolean,
     createWorkoutToggle: Function,
     createWorkoutModal: boolean,
+    importToggle: Function,
+    importModal: boolean,
     userSettings: userInfo,
     updateUserSettings: Function,
     allWorkouts: Array<workoutEntry>
@@ -38,6 +41,8 @@ export interface SidebarState {
     runnerInfo: RunnerData,
     changeViewModal: boolean,
     editProfileModal: boolean,
+    scope: string,
+    redirectUrl: string,
 }
 
 export interface RunnerData {
@@ -67,7 +72,9 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
                 runnerid: 0,
             },
             changeViewModal: false,
-            editProfileModal: false
+            editProfileModal: false,
+            scope: 'read,activity:read_all',
+            redirectUrl: 'http://localhost:3001/redirect'
         };
     }
 
@@ -121,20 +128,27 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
         }
     };
 
+    numberWithCommas = (num: Number) => {
+        return num.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    }
+
     calculateStats = () => {
         var mileageCount = 0;
         var elevationCount = 0;
         var timeCount = 0;
         this.props.allWorkouts.forEach((workout : workoutEntry) => {
-            if (workout.units === "mi") {
-                mileageCount = mileageCount + workout.distance;
-                elevationCount = elevationCount + workout.elevationgain;
-
-            } else {
-                mileageCount = mileageCount + (workout.distance * .621371);
-                elevationCount = elevationCount + (workout.elevationgain * 3.2808);
-            };
-            timeCount = timeCount + workout.elapsedtime;
+            
+            if (new Date(workout.timestamp).getFullYear() === this.props.navigateDate.getFullYear() && new Date(workout.timestamp).getMonth() === this.props.navigateDate.getMonth()) {
+                if (workout.units === "mi") {
+                    mileageCount = mileageCount + workout.distance;
+                    elevationCount = elevationCount + workout.elevationgain;
+    
+                } else {
+                    mileageCount = mileageCount + (workout.distance * .621371);
+                    elevationCount = elevationCount + (workout.elevationgain * 3.2808);
+                };
+                timeCount = timeCount + workout.elapsedtime;
+            }
         });
         this.setState ({
             totalMiles: mileageCount,
@@ -184,12 +198,19 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
         if (prevProps.viewAsUser !== this.props.viewAsUser) {
             this.getRunnerForCoach();
         }
+        if (prevProps.navigateDate !== this.props.navigateDate) {
+            this.calculateStats();
+        }
     }
 
     editProfileToggle = () => {
         this.setState(prevState => ({
             editProfileModal: !prevState.editProfileModal
         }));
+    }
+
+    stravaLogin = () => {
+        window.location.href = `http://www.strava.com/oauth/authorize?client_id=${process.env.REACT_APP_CLIENT_ID}&response_type=code&redirect_uri=${this.state.redirectUrl}/exchange_token&approval_prompt=force&scope=${this.state.scope}`;
     }
 
     render() { 
@@ -209,7 +230,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
                     <Menu iconShape="square">
                         <MenuItem icon={<FaCalendarAlt />} onClick={() => this.props.createPlanToggle()}>Create Plan Entry</MenuItem>
                         <MenuItem icon={<FaRunning />} onClick={() => this.props.createWorkoutToggle()}>Record Workout</MenuItem>
-                        <MenuItem icon={<FaCloudDownloadAlt />}>Import Workout</MenuItem>
+                        {(localStorage.getItem('stravaToken')) ? <MenuItem icon={<FaCloudDownloadAlt />} onClick={() => this.props.importToggle()}>Import Workout</MenuItem> : <MenuItem icon={<FaCloudDownloadAlt />} onClick={() => this.stravaLogin()}>Connect with Strava</MenuItem>}
                         <MenuItem icon={<FaEdit />} onClick={() => this.editProfileToggle()}>Edit Profile</MenuItem>
                     </Menu>
                     <SidebarHeader>
@@ -219,7 +240,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
                         <h6>Total Distance: </h6>
                         {(this.props.userSettings.defaultUnits === "mi") ? <p>{this.state.totalMiles.toFixed(2)}mi</p> : <p>{(this.state.totalMiles * 1.609344).toFixed(2)}km</p>}
                         <h6>Total Elevation Gain: </h6>
-                        {(this.props.userSettings.defaultUnits === "mi") ? <p>{this.state.totalElevation.toFixed(2)}ft</p> : <p>{(this.state.totalElevation / 3.2808).toFixed(2)}m</p>}
+                        {(this.props.userSettings.defaultUnits === "mi") ? <p>{this.numberWithCommas(this.state.totalElevation)}ft</p> : <p>{this.numberWithCommas(this.state.totalElevation / 3.2808)}m</p>}
                         <h6>Total Time:</h6>
                         <p>{this.state.totalHours}h{this.state.totalMinutes}m</p>
                     </SidebarContent>
@@ -228,7 +249,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
                     </SidebarHeader>
                     <SidebarContent>
                         <h6>Next Race: {this.state.nextRaceName}</h6>
-                        <h6>Next Race Date: {this.state.nextRaceDate.toString()}</h6>
+                        <h6>Next Race Date: {this.state.nextRaceDate}</h6>
                         <br/>
                         <h6>Time Until Race: </h6>
                         Weeks: {this.state.weeksUntilRace}&nbsp;

@@ -8,16 +8,26 @@ import Home from "./Components/Home";
 import Main from "./Components/Main";
 import Auth from "./Auth/Auth";
 import Logout from "./Auth/Logout";
+import StravaRedirect from './Components/StravaRedirect';
 
 export interface AppProps {
     
+}
+
+export interface stravaToken {
+  athleteId: string,
+  access_token: string,
+  refresh_token: string,
+  expires_at: number,
+  expires_in: number
 }
  
 export interface AppState {
     sessionToken: string | null,
     userid: string,
     newToken: string,
-    showLogin: boolean
+    showLogin: boolean,
+    stravaTokenData: stravaToken
 }
 
 class App extends React.Component<AppProps, AppState> {
@@ -27,7 +37,14 @@ class App extends React.Component<AppProps, AppState> {
         sessionToken: '',
         userid: '',
         newToken: '',
-        showLogin: true
+        showLogin: true,
+        stravaTokenData : {
+          athleteId: '',
+          access_token: '',
+          refresh_token: '',
+          expires_at: 0,
+          expires_in: 0
+      }
       };
   }
 
@@ -75,6 +92,7 @@ class App extends React.Component<AppProps, AppState> {
               <Route path="/login"><Auth updateToken={this.updateToken} showLogin={true} /></Route>
               <Route path="/signup"><Auth updateToken={this.updateToken} showLogin={false} /></Route>
               <Route path="/logout"><Logout clearToken={this.clearToken} /></Route>
+              <Route path="/redirect"><StravaRedirect /></Route>
             </Switch>
   
   

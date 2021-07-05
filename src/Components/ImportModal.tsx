@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Form, Label, Button, Modal, ModalHeader, ModalBody, ModalFooter, Progress } from 'reactstrap';
 import { APIURL } from '../Helpers/environment';
+import { workoutEntry } from './Main';
 
 
 export interface ImportModalProps {
@@ -36,7 +37,6 @@ class ImportModal extends React.Component<ImportModalProps, ImportModalState> {
     }
 
     componentDidUpdate(prevProps: ImportModalProps, prevState: ImportModalState) {
-
     }
 
 
@@ -52,7 +52,7 @@ class ImportModal extends React.Component<ImportModalProps, ImportModalState> {
 
     startImport = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
-        this.setState({ progressIndicator: 5 })
+        this.setState({ progressIndicator: 25 })
         this.setState({ progressStatus: "Starting Import" });
         let tmpToken : string | null = localStorage.getItem('stravaToken')
         if (tmpToken) {
@@ -98,42 +98,52 @@ class ImportModal extends React.Component<ImportModalProps, ImportModalState> {
         })
     };
 
-    getUserRuns = (accessToken: string) => {
-        this.setState({ progressIndicator: 25 })
-        this.setState({ progressStatus: "Connecting to Strava" });
-        var startEpoch : number = Math.floor(this.state.beginningDate.getTime()/1000.0);
-        var endEpoch : number = Math.floor(this.state.endingDate.getTime()/1000.0);
-        var lastPage : boolean = false;
-        var resultsPage = 1;
-        do {
-            fetch(`https://www.strava.com/api/v3/athlete/activities?before=${endEpoch}&after=${startEpoch}&page=${resultsPage}&per_page=30`, {
+    paginated_fetch = async (accessToken: string, url : string, page : number, previousRunData : Array<workoutEntry>): Promise<any> => {
+        try {
+            let response = await fetch(`${url}&page=${page}&per_page=30`, {
                 method: 'GET',
                 headers: new Headers({
                     'Authorization': `Bearer ${accessToken}`
                 })
             })
-            .then((response) => response.json())
-            .then((runData) => { 
-                console.log(runData);
-                let totalEntries = runData.length;
-                let currentEntry = 0;
-                runData.forEach((workout: any) => {
-                    this.setState({ progressStatus: "Processing Workouts" })
-                    ++currentEntry;
-                    let percentComplete = currentEntry / totalEntries;
-                    console.log((percentComplete * 100).toFixed(0));
-                    this.setState({ progressIndicator: parseInt((percentComplete * 100).toFixed(0)) });
-                    let tmpUserid: string | null = localStorage.getItem('userid')
-                    if (workout.type === "Run") {
-                        if(tmpUserid) {
-                            this.createWorkout(workout, parseInt(tmpUserid.toString()))
-                        }
+            let newRunData = await response.json();
+            const runData = [...previousRunData, ...newRunData];
+            if (newRunData.length !== 0) {
+                page++;
+                return this.paginated_fetch(accessToken, url, page, runData)
+            }
+            return runData;
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    getUserRuns = (accessToken: string) => {
+        this.setState({ progressIndicator: 50 })
+        this.setState({ progressStatus: "Connecting to Strava" });
+        var startEpoch : number = Math.floor(this.state.beginningDate.getTime()/1000.0);
+        var endEpoch : number = Math.floor(this.state.endingDate.getTime()/1000.0);
+        
+        this.paginated_fetch(accessToken, `https://www.strava.com/api/v3/athlete/activities?before=${endEpoch}&after=${startEpoch}`, 1, [])
+        .then((runData) => {
+            var totalEntries = runData.length;
+            let currentEntry = 0;
+            runData.forEach((workout: any) => {
+                this.setState({ progressStatus: "Processing Workouts" })
+                ++currentEntry;
+                let percentComplete = currentEntry / totalEntries;
+                this.setState({ progressIndicator: parseInt((percentComplete * 100).toFixed(0)) });
+                let tmpUserid: string | null = localStorage.getItem('userid')
+                if (workout.type === "Run") {
+                    if(tmpUserid) {
+                        this.createWorkout(workout, parseInt(tmpUserid.toString()))
                     }
-                })
-                this.setState({ progressStatus: "Complete"});
-                this.props.updateEvents();
+                }
             })
-        } while (lastPage === false);
+            this.setState({ progressStatus: "Complete"});
+            this.props.updateEvents();
+        })
     };
     
     render() { 

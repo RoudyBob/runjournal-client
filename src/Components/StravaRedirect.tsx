@@ -24,7 +24,7 @@ class StravaRedirect extends React.Component<StravaRedirectProps, StravaRedirect
                 method: 'POST'
             });
             let tokenData = await response.json();
-            console.log(tokenData);
+            // console.log(tokenData);
             return tokenData;
         } catch (error) {
             console.log(error);
@@ -32,7 +32,7 @@ class StravaRedirect extends React.Component<StravaRedirectProps, StravaRedirect
     };
 
     getUserData = async (athleteid: string, accessToken: string) => {
-        console.log(`in getUserData`)
+        // console.log(`in getUserData`)
         try {
             let response = await fetch(
                 `https://www.strava.com/api/v3/athletes/${athleteid}/stats`, {

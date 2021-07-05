@@ -178,6 +178,7 @@
 
 .rbc-event.plan {
   background-color: #4e6ba6;
+  font-size: small;
 }
 
 .rbc-event.plan.rbc-selected {
@@ -187,6 +188,7 @@
 
 .rbc-event.workout {
   background-color: #ecba2d;
+  font-size: small;
 }
 
 .rbc-event.workout.rbc-selected {

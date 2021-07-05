@@ -40,7 +40,7 @@ class CreatePlanModal extends React.Component<CreatePlanModalProps, CreatePlanMo
 
     createPlan = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(this.props.viewAsUser);
+        // console.log(`Viewing as userID: ${this.props.viewAsUser}`);
         fetch(`${APIURL}/plan`, {
             method: 'POST',
             body: JSON.stringify({

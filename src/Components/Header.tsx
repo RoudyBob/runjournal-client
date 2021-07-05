@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { Link } from 'react-router-dom';
+import { IMGURL } from '../Helpers/environment';
 
 export interface HeaderProps {
     token: string | null
@@ -15,12 +16,19 @@ class Header extends React.Component<HeaderProps, HeaderState> {
         this.state = {};
     }
 
+    renderImg = (filename: string, altText: string, width?: string) => {
+        let url = `${IMGURL}/${filename}`
+        return (
+            <img src={url} alt={altText} width={width} />
+        )
+    }
+
     render() { 
         return (
             <div className="header">
                 <nav className="navbar navbar-expand-lg navbar-light fixed-top">
                         <div className="navbar-home">
-                            {this.props.token ? <Link className="navbar-brand" to={"/main"}><img src="http://localhost:3001/runjournal.png" alt="RunJournal Logo" /></Link> : <Link className="navbar-brand" to={"/"}><img src="http://localhost:3001/runjournal.png" alt="RunJournal Logo" /></Link>}
+                            {this.props.token ? <Link className="navbar-brand" to={"/main"}>{this.renderImg("runjournal.png", "Run Journal Logo")}</Link> : <Link className="navbar-brand" to={"/"}>{this.renderImg("runjournal.png", "Run Journal Logo")}</Link>}
                         </div>
                         <div className="collapse navbar-collapse" id="main-navbar">
                             <ul className="navbar-nav ml-auto">

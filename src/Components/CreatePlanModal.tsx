@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { stringOrDate } from 'react-big-calendar';
 import { Form, Label, ModalFooter, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
-import APIURL from '../Helpers/environment';
+import { APIURL } from '../Helpers/environment';
 import { slotInfo, userInfo } from './Main';
 
 export interface CreatePlanModalProps {
@@ -40,7 +40,7 @@ class CreatePlanModal extends React.Component<CreatePlanModalProps, CreatePlanMo
 
     createPlan = (e: React.ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(this.props.viewAsUser);
+        // console.log(`Viewing as userID: ${this.props.viewAsUser}`);
         fetch(`${APIURL}/plan`, {
             method: 'POST',
             body: JSON.stringify({

@@ -85,13 +85,12 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
         this.props.allPlans.forEach((plan: planEntry) => {
             // var raceDate : stringOrDate = '';
             if (plan.type === "race") {
-                if(Date.parse(plan.date.toString()) < Date.parse(raceDateHolder.toString())) {
+                if(Date.parse(plan.date.toString()) < Date.parse(raceDateHolder.toString()) && new Date(plan.date) >= new Date()) {
                     raceFound = true;
                     raceDateHolder = plan.date;
                     raceNameHolder = plan.description;
                 }
             }
-
         });
 
         if (!raceFound) {

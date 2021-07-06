@@ -183,8 +183,8 @@ class Main extends React.Component<MainProps, MainState> {
                 userId: 0
             }],
             selectedSlotInfo: {
-                start: new Date(),
-                end: new Date()
+                start: '',
+                end: ''
             }
         };
     }
@@ -260,6 +260,7 @@ class Main extends React.Component<MainProps, MainState> {
 
     createWorkoutToggle = () => {
         let tmpDate = new Date().toISOString().split("T")[0] + "T00:00";
+        // console.log(`createWorkoutToggle tmpDate: ${tmpDate}`);
         if (!this.state.selectedSlotInfo.start) {
         this.setState({
             selectedSlotInfo: {
@@ -301,14 +302,14 @@ class Main extends React.Component<MainProps, MainState> {
         })
         .then((response) => response.json())
         .then((workout) => {
-            // console.log(workout);
-            // console.log(workout.timestamp);
-            // console.log(workout.timestamp.replace('Z', ''))
-            // console.log(new Date(new Date(workout.timestamp).toString().split('GMT')[0]+' UTC').toISOString().replace('Z', '').toString());
+            // console.log(`Fetch Workout - Timestamp: ${workout.timestamp}`);
+            let tmpDate = new Date((workout.timestamp));
+            tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
+            // console.log(`Temp Workout Date: ${tmpDate.toISOString()}`);
             this.setState({ 
                 selectedWorkout: {
                     id: workout.id,
-                    timestamp: workout.timestamp.replace('Z', ''), 
+                    timestamp: tmpDate.toISOString().replace('Z', ''), 
                     description: workout.description,
                     distance: workout.distance,
                     units: workout.units,
@@ -398,15 +399,15 @@ class Main extends React.Component<MainProps, MainState> {
             var tmpWorkouts = this.state.events;
             this.setState({ allWorkouts: workouts })
             workouts.forEach((workout: workoutEntry) =>{
-                var tmpDate = new Date(workout.timestamp);
-                tmpDate.setHours(tmpDate.getHours() + (new Date().getTimezoneOffset() / 60));
-                console.log(`tmpdate: ${tmpDate}`);
-                console.log(`workoutdate: ${workout.timestamp}`)
+                // console.log(`Fetch Workout - Timestamp: ${workout.timestamp}`);
+                let tmpDate = new Date(workout.timestamp);
+                tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
+                // console.log(`Temp Workout Date: ${tmpDate.toISOString()}`);
                 var newEvent = {
-                    start: new Date(new Date(workout.timestamp).toString().split('GMT')[0]+' UTC').toISOString().replace('Z', '').toString(),
-                    end: new Date(new Date(workout.timestamp).toString().split('GMT')[0]+' UTC').toISOString().replace('Z', '').toString(),
-                    // start: tmpDate.toISOString(),
-                    // end: tmpDate.toISOString(),
+                    // start: new Date(new Date(workout.timestamp).toString().split('GMT')[0]+' UTC').toISOString().replace('Z', '').toString(),
+                    // end: new Date(new Date(workout.timestamp).toString().split('GMT')[0]+' UTC').toISOString().replace('Z', '').toString(),
+                    start: tmpDate.toISOString().replace('Z', ''),
+                    end: tmpDate.toISOString().replace('Z', ''),
                     title: workout.description,
                     type: "workout",
                     id: workout.id
@@ -509,14 +510,14 @@ class Main extends React.Component<MainProps, MainState> {
     }
 
     updateSelectedWorkout = (updatedWorkout: workoutEntry) => {
-        var tmpDate = new Date(updatedWorkout.timestamp);
+        // console.log(`Update Workout - Timestamp: ${updatedWorkout.timestamp}`);
+        let tmpDate = new Date(updatedWorkout.timestamp);
         tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
-        // console.log(updatedWorkout.timestamp);
-        // console.log(tmpDate.toISOString().slice(0, -5));
+        // console.log(`Temp Workout Date: ${tmpDate.toISOString()}`);
         this.setState({ 
             selectedWorkout: {
                 id: updatedWorkout.id,
-                timestamp: tmpDate.toISOString().slice(0, -5),
+                timestamp: tmpDate.toISOString().replace('Z',''),
                 description: updatedWorkout.description,
                 distance: updatedWorkout.distance,
                 units: updatedWorkout.units,
@@ -551,12 +552,14 @@ class Main extends React.Component<MainProps, MainState> {
     }
 
     updateSelectedWorkoutSlotInfo = (slotDateTime: stringOrDate) => {
-        var tmpDate = new Date(slotDateTime);
+        // console.log(`Workout Slot - Timestamp: ${slotDateTime}`);
+        let tmpDate = new Date(slotDateTime);
         tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
+        // console.log(`Temp Workout SLot Date: ${tmpDate.toISOString()}`);
         this.setState({
             selectedSlotInfo: {
-                start: tmpDate.toISOString().split(":")[0] + ":" + tmpDate.toISOString().split(":")[1],
-                end: tmpDate.toISOString().split(":")[0] + ":" + tmpDate.toISOString().split(":")[1],
+                start: tmpDate.toISOString().replace('Z', ''),
+                end: tmpDate.toISOString().replace('Z', ''),
             }
         })
     }

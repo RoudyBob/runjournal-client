@@ -76,6 +76,7 @@ class CreatePlanModal extends React.Component<CreatePlanModalProps, CreatePlanMo
 
     exitModal = () => {
         this.setState({ units: this.props.userSettings.defaultUnits });
+        this.setState({ type: "workout" });
         this.props.createPlanToggle();
     }
 

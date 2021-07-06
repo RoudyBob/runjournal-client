@@ -74,7 +74,7 @@ class Sidebar extends React.Component<SidebarProps, SidebarState> {
             changeViewModal: false,
             editProfileModal: false,
             scope: 'read,activity:read_all',
-            redirectUrl: 'http://localhost:3001/redirect'
+            redirectUrl: 'https://www.runjournal.fit/redirect'
         };
     }
 

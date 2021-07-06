@@ -398,9 +398,15 @@ class Main extends React.Component<MainProps, MainState> {
             var tmpWorkouts = this.state.events;
             this.setState({ allWorkouts: workouts })
             workouts.forEach((workout: workoutEntry) =>{
+                var tmpDate = new Date(workout.timestamp);
+                tmpDate.setHours(tmpDate.getHours() + (new Date().getTimezoneOffset() / 60));
+                console.log(`tmpdate: ${tmpDate}`);
+                console.log(`workoutdate: ${workout.timestamp}`)
                 var newEvent = {
                     start: new Date(new Date(workout.timestamp).toString().split('GMT')[0]+' UTC').toISOString().replace('Z', '').toString(),
                     end: new Date(new Date(workout.timestamp).toString().split('GMT')[0]+' UTC').toISOString().replace('Z', '').toString(),
+                    // start: tmpDate.toISOString(),
+                    // end: tmpDate.toISOString(),
                     title: workout.description,
                     type: "workout",
                     id: workout.id

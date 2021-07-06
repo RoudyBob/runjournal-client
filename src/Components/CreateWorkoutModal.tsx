@@ -56,7 +56,9 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
         e.preventDefault();
         var tmpDate = new Date(this.props.selectedSlotInfo.start);
         tmpDate.setHours(tmpDate.getHours() - (new Date().getTimezoneOffset() / 60));
-        console.log(this.props.viewAsUser);
+        // console.log(`slot date: ${this.props.selectedSlotInfo.start}`)
+        // console.log(`temp date: ${tmpDate}`);
+        // console.log(`Current userID: ${this.props.viewAsUser}`);
         fetch(`${APIURL}/workout`, {
             method: 'POST',
             body: JSON.stringify({

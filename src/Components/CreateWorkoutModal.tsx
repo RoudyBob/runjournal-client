@@ -59,6 +59,7 @@ class CreateWorkoutModal extends React.Component<CreateWorkoutModalProps, Create
         // console.log(`slot date: ${this.props.selectedSlotInfo.start}`)
         // console.log(`temp date: ${tmpDate}`);
         // console.log(`Current userID: ${this.props.viewAsUser}`);
+        // console.log(`selectedSlotInfoStart: ${this.props.selectedSlotInfo.start}`);
         fetch(`${APIURL}/workout`, {
             method: 'POST',
             body: JSON.stringify({

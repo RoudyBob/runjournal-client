@@ -62,11 +62,17 @@ class ImportModal extends React.Component<ImportModalProps, ImportModalState> {
     }
 
     createWorkout = (workout: any, userid: number) => {
+        // console.log(`Strava Workout - Timestamp: ${workout.start_date}`);
+        let tmpDate = new Date((workout.start_date));
+        let offset = (Math.abs(parseInt(workout.utc_offset)) / 60) / 60;
+        // console.log(offset);
+        tmpDate.setHours(tmpDate.getHours() - offset);
+        // console.log(`Temp Workout Timestamp: ${tmpDate.toISOString()}`);
         fetch(`${APIURL}/workout/import`, {
             method: 'POST',
             body: JSON.stringify({
                 workout: {
-                    timestamp: workout.start_date_local,
+                    timestamp: tmpDate.toISOString().replace('Z', ''),
                     description: workout.name,
                     distance: (workout.distance *  0.00062137119224).toFixed(2),
                     units: "mi",
@@ -161,11 +167,11 @@ class ImportModal extends React.Component<ImportModalProps, ImportModalState> {
                         </div>
                         <div className="form-group">
                             <Label>Import Runs Beginning</Label>
-                            <input type="date" className="form-control" value={this.state.beginningDate.toISOString().split("T")[0]} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ beginningDate : new Date(e.currentTarget.value) })} required />
+                            <input type="date" className="form-control" onKeyDown={(e) => e.preventDefault()} value={this.state.beginningDate.toISOString().split("T")[0]} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ beginningDate : new Date(e.currentTarget.value) })} required />
                         </div>
                         <div className="form-group">
                             <Label>Import Runs Ending</Label>
-                            <input type="date" className="form-control" value={this.state.endingDate.toISOString().split("T")[0]} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ endingDate : new Date(e.currentTarget.value) })} required />
+                            <input type="date" className="form-control" onKeyDown={(e) => e.preventDefault()} value={this.state.endingDate.toISOString().split("T")[0]} onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.setState({ endingDate : new Date(e.currentTarget.value) })} required />
                         </div>
                         <ModalFooter>
                             {(this.state.progressIndicator === 0) ? <Button color="primary">Import from Strava</Button> : null}

@@ -13,6 +13,11 @@ switch (window.location.hostname) {
         // this is the full url of your deployed API
         APIURL = 'https://runjournal-server.herokuapp.com';
         IMGURL = 'https://myrunjournal.herokuapp.com';
+        break;
+    case 'www.runjournal.fit':
+        // this is the full url of your deployed API
+        APIURL = 'https://runjournal-server.herokuapp.com';
+        IMGURL = 'https://www.runjournal.fit';
 }
 
 export {APIURL, IMGURL};

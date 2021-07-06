@@ -12,7 +12,7 @@ switch (window.location.hostname) {
     case 'myrunjournal.herokuapp.com':
         // this is the full url of your deployed API
         APIURL = 'https://runjournal-server.herokuapp.com';
-        IMGURL = 'https://www.runjournal.fit';
+        IMGURL = 'https://myrunjournal.herokuapp.com';
 }
 
 export {APIURL, IMGURL};

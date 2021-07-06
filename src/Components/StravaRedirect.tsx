@@ -17,7 +17,7 @@ class StravaRedirect extends React.Component<StravaRedirectProps, StravaRedirect
     }
 
     authGetter = async (authTok: string) => {
-        console.log(`in testAuthGetter`)
+        // console.log(`in testAuthGetter`)
         try {
             let response = await fetch(
             `https://www.strava.com/api/v3/oauth/token?client_id=${process.env.REACT_APP_CLIENT_ID}&client_secret=${process.env.REACT_APP_CLIENT_SECRET}&code=${authTok}&grant_type=authorization_code`, {
